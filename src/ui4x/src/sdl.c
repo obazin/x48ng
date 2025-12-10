@@ -113,7 +113,6 @@ static annunciators_ui_t annunciators_ui[ NB_ANNUNCIATORS ] = {
     {.x = 241, .y = 4, .width = ann_io_width,      .height = ann_io_height,      .bits = ann_io_bitmap     },
 };
 
-static int display_buffer_grayscale[ LCD_WIDTH * 80 ];
 static int last_annunciators = -1;
 static int last_contrast = -1;
 
@@ -977,8 +976,6 @@ static int sdl_emulator_release_key( int hpkey )
     return hpkey;
 }
 
-static void blank_lcd( void ) { memset( display_buffer_grayscale, 0, sizeof( display_buffer_grayscale ) ); }
-
 static void sdl_update_annunciators( void )
 {
     int annunciators = ui4x_emulator_api.get_annunciators();
@@ -1124,12 +1121,14 @@ void sdl_ui_handle_pending_inputs( void )
 
 void sdl_ui_refresh_lcd( void )
 {
+    int display_buffer_grayscale[ LCD_WIDTH * 80 ];
+
+    memset( display_buffer_grayscale, 0, sizeof( display_buffer_grayscale ) );
+
     setup_colors();
 
     if ( ui4x_emulator_api.is_display_on() )
         ui4x_emulator_api.get_lcd_buffer( display_buffer_grayscale );
-    else
-        blank_lcd();
 
     SDL_SetRenderTarget( renderer, display_texture );
 
@@ -1160,8 +1159,6 @@ void sdl_ui_refresh_lcd( void )
 
 void sdl_init_ui( void )
 {
-    blank_lcd();
-
     // Initialize SDL
     if ( !SDL_Init( SDL_INIT_VIDEO ) ) {
         printf( "Couldn't initialize SDL: %s\n", SDL_GetError() );

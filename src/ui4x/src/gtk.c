@@ -28,7 +28,6 @@ static GtkWidget* gtk_ui_lcd_canvas;
 static cairo_surface_t* gtk_ui_lcd_surface;
 
 static char last_annunciators = 0;
-static int display_buffer_grayscale[ LCD_WIDTH * 80 ];
 
 /*************************/
 /* Functions' prototypes */
@@ -248,10 +247,12 @@ static void gtk_ui_open_menu( int x, int y, void* data )
 
 static void gtk_ui_redraw_lcd( GtkDrawingArea* _widget, cairo_t* cr, int width, int height, gpointer _user_data )
 {
-    cairo_pattern_t* lcd_pattern = cairo_pattern_create_for_surface( gtk_ui_lcd_surface );
-    cairo_pattern_set_filter( lcd_pattern, CAIRO_FILTER_FAST );
+    if ( gtk_ui_lcd_surface == NULL )
+        return;
+
     cairo_scale( cr, ( double )width / ( double )LCD_WIDTH, ( double )height / ( double )LCD_HEIGHT );
-    cairo_set_source( cr, lcd_pattern );
+    cairo_set_source_surface( cr, gtk_ui_lcd_surface, 0, 0 );
+    cairo_pattern_set_filter( cairo_get_source( cr ), CAIRO_FILTER_FAST );
 
     cairo_paint( cr );
 }
@@ -859,25 +860,32 @@ void gtk_ui_refresh_lcd( void )
 
     gtk_ui_refresh_annunciators();
 
-    if ( NULL != gtk_ui_lcd_surface )
-        g_free( gtk_ui_lcd_surface );
+    /* 1. retrieve emulators' pixels into buffer */
+    int display_buffer_grayscale[ LCD_WIDTH * 80 ];
+    memset( display_buffer_grayscale, 0, sizeof( display_buffer_grayscale ) );
+
+    ui4x_emulator_api.get_lcd_buffer( display_buffer_grayscale );
+
+    /* 2. draw those pixels onto gtk_ui_lcd_surface */
+    /* 2.1 create blank surface and its context */
     gtk_ui_lcd_surface = cairo_image_surface_create( CAIRO_FORMAT_ARGB32, LCD_WIDTH, LCD_HEIGHT );
     cairo_t* cr = cairo_create( gtk_ui_lcd_surface );
 
-    int n_levels_of_gray = N_LEVELS_OF_GRAY * 1.0;
-    int pixel_on_r = ( ( COLORS[ COLOR_PIXEL_ON ].rgb >> 16 ) & 0xff ) / 256.0;
-    int pixel_on_g = ( ( COLORS[ COLOR_PIXEL_ON ].rgb >> 8 ) & 0xff ) / 256.0;
-    int pixel_on_b = ( COLORS[ COLOR_PIXEL_ON ].rgb & 0xff ) / 256.0;
-
-    ui4x_emulator_api.get_lcd_buffer( display_buffer_grayscale );
+    /* 2.2 paint each pixel */
     for ( int y = 0; y < LCD_HEIGHT; y++ ) {
         for ( int x = 0; x < LCD_WIDTH; x++ ) {
-            cairo_set_source_rgba( cr, pixel_on_r, pixel_on_g, pixel_on_b,
-                                   display_buffer_grayscale[ ( y * LCD_WIDTH ) + x ] / ( n_levels_of_gray - 1.0 ) );
-            cairo_rectangle( cr, x, y, 1.0, 1.0 );
+            gdk_cairo_set_source_rgba( cr, &( ( GdkRGBA ){ .red = ( ( COLORS[ COLOR_PIXEL_ON ].rgb >> 16 ) & 0xff ) / 256.0,
+                                                           .green = ( ( COLORS[ COLOR_PIXEL_ON ].rgb >> 8 ) & 0xff ) / 256.0,
+                                                           .blue = ( ( COLORS[ COLOR_PIXEL_ON ].rgb ) & 0xff ) / 256.0,
+                                                           .alpha = ( display_buffer_grayscale[ ( y * LCD_WIDTH ) + x ] ) /
+                                                                    ( ( float )( N_LEVELS_OF_GRAY - 1 ) ) } ) );
+            gdk_cairo_rectangle( cr, &( ( GdkRectangle ){ .x = x, .y = y, .width = 1, .height = 1 } ) );
+
             cairo_fill( cr );
         }
     }
+
+    cairo_surface_flush( gtk_ui_lcd_surface );
 
     cairo_destroy( cr );
 

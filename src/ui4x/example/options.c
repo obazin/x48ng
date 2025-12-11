@@ -197,7 +197,7 @@ ui4x_config_t* config_init( int argc, char* argv[] )
     if ( __config.model == MODEL_49G || __config.model == MODEL_50G )
         __config.black_lcd = true;
 
-    __config.progname = basename( strdup( argv[ 0 ] ) );
+    __config.progname = basename( argv[ 0 ] );
     switch ( __config.model ) {
         case MODEL_48GX:
             strcat( __config.progname, "48gx" );

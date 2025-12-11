@@ -4,7 +4,7 @@ set -eu
 
 cd "$(dirname "$0")" || exit 1
 
-BINNAME=${BINNAME:-x48ng}
+BINNAME=${BINNAME:-./x48ng}
 CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
 CONFIGDIR=${CONFIGDIR:-$CONFIG_HOME/$BINNAME}
 

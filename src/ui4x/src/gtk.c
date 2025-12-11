@@ -648,22 +648,26 @@ static void gtk_ui_activate( GtkApplication* app, void* data )
     gtk_widget_add_controller( gtk_ui_window, keys_controller );
 
     /* for --netbook */
+    /* Top container which sill hold the header, LCD, IO, keyboard above netbook_pivot_line */
     GtkWidget* upper_left_container = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0 );
     gtk_widget_add_css_class( upper_left_container, "upper-left-container" );
     gtk_widget_set_name( upper_left_container, "upper-left-container" );
     gtk_box_append( ( GTK_BOX( window_container ) ), upper_left_container );
 
+    /* Down container which sill hold the keyboard below netbook_pivot_line */
     GtkWidget* downer_right_container = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0 );
     gtk_widget_set_vexpand( GTK_WIDGET( downer_right_container ), true );
     gtk_widget_add_css_class( downer_right_container, "downer-right-container" );
     gtk_widget_set_name( downer_right_container, "downer-right-container" );
     gtk_box_append( GTK_BOX( window_container ), downer_right_container );
 
+    /* Header */
     GtkWidget* header_container = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
     gtk_widget_add_css_class( header_container, "header-container" );
     gtk_widget_set_name( header_container, "header-container" );
     gtk_box_append( ( GTK_BOX( upper_left_container ) ), header_container );
 
+    /* Display */
     gtk_ui_lcd_canvas = gtk_drawing_area_new();
     gtk_widget_add_css_class( gtk_ui_lcd_canvas, "lcd" );
     gtk_widget_set_name( gtk_ui_lcd_canvas, "lcd" );
@@ -701,10 +705,27 @@ static void gtk_ui_activate( GtkApplication* app, void* data )
 
     gtk_box_append( GTK_BOX( upper_left_container ), display_container );
 
+    /* Controller that handles right-click for menu on LCD */
     GtkGesture* right_click_controller = gtk_gesture_click_new();
     gtk_gesture_single_set_button( GTK_GESTURE_SINGLE( right_click_controller ), 3 );
     g_signal_connect_swapped( right_click_controller, "pressed", G_CALLBACK( gtk_ui_react_to_display_click ), data );
     gtk_widget_add_controller( display_container, GTK_EVENT_CONTROLLER( right_click_controller ) );
+
+    /* I/O devices */
+    GtkWidget* io_devices_container = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
+    gtk_widget_add_css_class( io_devices_container, "io-devices-container" );
+    gtk_widget_set_name( io_devices_container, "io-devices-container" );
+    gtk_box_append( ( GTK_BOX( upper_left_container ) ), io_devices_container );
+    if ( ui4x_config.wire_name != NULL ) {
+        GtkWidget* label_wire = _gtk_ui_activate__create_label( "wire", ui4x_config.wire_name );
+        gtk_box_append( GTK_BOX( io_devices_container ), label_wire );
+        gtk_widget_set_halign( GTK_WIDGET( label_wire ), GTK_ALIGN_START );
+    }
+    if ( ui4x_config.ir_name != NULL ) {
+        GtkWidget* label_ir = _gtk_ui_activate__create_label( "ir", ui4x_config.ir_name );
+        gtk_box_append( GTK_BOX( io_devices_container ), label_ir );
+        gtk_widget_set_halign( GTK_WIDGET( label_ir ), GTK_ALIGN_END );
+    }
 
     // keyboard
     GtkWidget* high_keyboard_container = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0 );

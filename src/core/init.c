@@ -14,6 +14,8 @@
 #include "persistence.h"
 #include "serial.h"
 
+#include "../ui4x/src/api.h"
+
 // bool please_exit = false;
 bool save_before_exit = true;
 
@@ -101,11 +103,11 @@ void start_emulator( void )
             saturn.pc = 0x00000;
     } else {
         /* if files were not readable => initialize */
-        if ( config.verbose )
-            fprintf( stderr, "initialization of %s\n", normalized_config_path );
+        /* if ( ui4x_config.verbose ) */
+        /*     fprintf( stderr, "initialization of %s\n", normalized_config_path ); */
 
         init_saturn();
-        if ( !read_rom( normalized_rom_path ) )
+        if ( !read_rom( ui4x_make_filename_absolute( (char*)"rom" ) ) )
             exit( 1 ); /* can't read ROM */
     }
 

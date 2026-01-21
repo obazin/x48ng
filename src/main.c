@@ -10,6 +10,8 @@
 
 #include <sys/time.h>
 
+#include <glib.h>
+
 #include "core/debugger.h"
 #include "core/emulate.h"
 #include "core/init.h"
@@ -34,7 +36,7 @@ void signal_handler( int sig )
             sigalarm_triggered = true;
             break;
         case SIGPIPE:
-            exit_ui();
+            ui4x_exit();
             stop_emulator();
             exit( EXIT_SUCCESS );
         default:
@@ -46,6 +48,17 @@ int main( int argc, char** argv )
 {
     setlocale( LC_ALL, "C" );
 
+    char* progname = g_path_get_basename( argv[ 0 ] );
+    char* progpath = g_path_get_dirname( argv[ 0 ] );
+    char* default_datadir = g_build_filename( g_get_user_config_dir(), progname, NULL );
+
+    /* The config is set from, by order of priority:
+       - command line arguments
+       - configuration file
+       - hard-coded default values
+     */
+    /* First config pass, core x50ng parses argv */
+    // config_t __config = *config_init( argc, argv );
     config = *config_init( argc, argv );
 
     /********************/
@@ -55,43 +68,43 @@ int main( int argc, char** argv )
     /* Emulator */
     init_emulator( &config );
 
-    /* (G)UI */
-    ui4x_config_t config_ui = {
-        .model = config.model,
-        .shiftless = config.shiftless,
-        .black_lcd = config.black_lcd,
-        .newrpl_keyboard = false,
+    /* /\* (G)UI *\/ */
+    /* ui4x_config_t config_ui = { */
+    /*     .model = config.model, */
+    /*     .shiftless = config.shiftless, */
+    /*     .black_lcd = config.black_lcd, */
+    /*     .newrpl_keyboard = false, */
 
-        .frontend = config.frontend,
+    /*     .frontend = config.frontend, */
 
-        .mono = config.mono,
-        .gray = config.gray,
+    /*     .mono = config.mono, */
+    /*     .gray = config.gray, */
 
-        .chromeless = config.chromeless,
-        .fullscreen = config.fullscreen,
+    /*     .chromeless = config.chromeless, */
+    /*     .fullscreen = config.fullscreen, */
 
-        .tiny = config.tiny,
-        .small = config.small,
+    /*     .tiny = config.tiny, */
+    /*     .small = config.small, */
 
-        .verbose = config.verbose,
+    /*     .verbose = config.verbose, */
 
-        .zoom = config.zoom,
+    /*     .zoom = config.zoom, */
 
-        .netbook = config.netbook,
-        .netbook_pivot_line = 3,
+    /*     .netbook = config.netbook, */
+    /*     .netbook_pivot_line = 3, */
 
-        .name = config.progname,
-        .progname = config.progname,
-        .progpath = NULL,
+    /*     .name = config.progname, */
+    /*     .progname = config.progname, */
+    /*     .progpath = NULL, */
 
-        .wire_name = config.wire_name,
-        .ir_name = config.ir_name,
+    /*     .wire_name = config.wire_name, */
+    /*     .ir_name = config.ir_name, */
 
-        .datadir = NULL,
-        .style_filename = ( char* )( config.model == MODEL_48GX ? "style-48gx.css" : "style-48sx.css" ),
+    /*     .datadir = NULL, */
+    /*     .style_filename = ( char* )( config.model == MODEL_48GX ? "style-48gx.css" : "style-48sx.css" ), */
 
-        .sd_dir = NULL,
-    };
+    /*     .sd_dir = NULL, */
+    /* }; */
 
     ui4x_emulator_api_t emulator_api = {
         .press_key = press_key,
@@ -111,7 +124,7 @@ int main( int argc, char** argv )
         .do_wake = NULL,
         .do_debug = NULL,
     };
-    init_ui( &config_ui, &emulator_api );
+    ui4x_init( argc, argv, progname, progpath, default_datadir, &emulator_api );
 
     /*****************************************/
     /* handlers for SIGALRM, SIGPIPE */
@@ -225,7 +238,7 @@ int main( int argc, char** argv )
     } while ( true /* !please_exit */ );
 
     /* Never reached when not using please_exit */
-    exit_ui();
+    ui4x_exit();
     stop_emulator();
 
     return 0;

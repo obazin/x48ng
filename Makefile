@@ -30,91 +30,31 @@ makeflags +=-j$(NUM_CORES) -l$(NUM_CORES)
 cc-option = $(shell if $(CC) $(1) -c -x c /dev/null -o /dev/null > /dev/null 2>&1; \
 		  then echo $(1); fi)
 
-### lua
+##############################
+# No serviceable parts under #
+##############################
+GLIB2_CFLAGS = $(shell "$(PKG_CONFIG)" --cflags glib-2.0)
+GLIB2_LDLIBS = $(shell "$(PKG_CONFIG)" --libs glib-2.0)
+
+GTK_CFLAGS = $(shell "$(PKG_CONFIG)" --cflags gtk4) -DHAS_GTK=1
+GTK_LDLIBS = $(shell "$(PKG_CONFIG)" --libs gtk4)
+
 LUA_CFLAGS = $(shell "$(PKG_CONFIG)" --cflags $(LUA_VERSION))
-LUA_LIBS = $(shell "$(PKG_CONFIG)" --libs $(LUA_VERSION))
+LUA_LDLIBS = $(shell "$(PKG_CONFIG)" --libs $(LUA_VERSION))
 
-### debugger
-DEBUG_CFLAGS = $(shell "$(PKG_CONFIG)" --cflags readline)
-DEBUG_LIBS = $(shell "$(PKG_CONFIG)" --libs readline)
-
-### Text UI
 NCURSES_CFLAGS = $(shell "$(PKG_CONFIG)" --cflags ncursesw) -DNCURSES_WIDECHAR=1 -DHAS_NCURSES=1
-NCURSES_LIBS = $(shell "$(PKG_CONFIG)" --libs ncursesw)
+NCURSES_LDLIBS = $(shell "$(PKG_CONFIG)" --libs ncursesw) -lreadline
 
 ### SDL UI
 ifeq ($(WITH_SDL), yes)
 	SDL_CFLAGS = $(shell "$(PKG_CONFIG)" --cflags sdl3) -DHAS_SDL=1
-	SDL_LIBS = $(shell "$(PKG_CONFIG)" --libs sdl3)
-	SDL_SRC = src/ui4x/src/sdl.c
-	SDL_HEADERS = src/ui4x/src/sdl.h
+	SDL_LDLIBS = $(shell "$(PKG_CONFIG)" --libs sdl3)
 endif
 
 ifeq ($(WITH_SDL2), yes)
 	SDL_CFLAGS = $(shell "$(PKG_CONFIG)" --cflags sdl2) -DHAS_SDL=1 -DHAS_SDL2=1
-	SDL_LIBS = $(shell "$(PKG_CONFIG)" --libs sdl2)
-	SDL_SRC = src/ui4x/src/sdl.c
-	SDL_HEADERS = src/ui4x/src/sdl.h
+	SDL_LDLIBS = $(shell "$(PKG_CONFIG)" --libs sdl2)
 endif
-
-ifeq ($(WITH_GTK), yes)
-	GTK_CFLAGS = -DHAS_GTK=1 $(shell "$(PKG_CONFIG)" --cflags gtk4)
-	GTK_LIBS = $(shell "$(PKG_CONFIG)" --libs gtk4)
-	GTK_SRC = src/ui4x/src/gtk.c
-	GTK_HEADERS = src/ui4x/src/gtk.h
-endif
-
-LIBS = -lm \
-	$(LUA_LIBS) \
-	$(DEBUG_LIBS) \
-	$(NCURSES_LIBS) \
-	$(SDL_LIBS) \
-	$(GTK_LIBS)
-
-HEADERS = src/options.h \
-	src/romio.h \
-	src/emulator_api.h \
-	src/core/debugger.h \
-	src/core/emulate.h \
-	src/core/init.h \
-	src/core/memory.h \
-	src/core/persistence.h \
-	src/core/registers.h \
-	src/core/timers.h \
-	src/core/serial.h \
-	src/ui4x/src/api.h \
-	src/ui4x/src/fonts.h \
-	src/ui4x/src/bitmaps_misc.h \
-	src/ui4x/src/api.h \
-	src/ui4x/src/inner.h \
-	src/ui4x/src/ncurses.h \
-	$(SDL_HEADERS) \
-	$(GTK_HEADERS)
-
-SRC = src/options.c \
-	src/romio.c \
-	src/main.c \
-	src/core/debugger.c \
-	src/core/emulate.c \
-	src/core/init.c \
-	src/core/persistence.c \
-	src/core/memory.c \
-	src/core/registers.c \
-	src/core/timers.c \
-	src/core/serial.c \
-	src/emulator_api.c \
-	src/ui4x/src/48gx.c \
-	src/ui4x/src/48sx.c \
-	src/ui4x/src/49g.c \
-	src/ui4x/src/50g.c \
-	src/ui4x/src/40g.c \
-	src/ui4x/src/api.c \
-	src/ui4x/src/fonts.c \
-	src/ui4x/src/bitmaps_misc.c \
-	src/ui4x/src/ncurses.c \
-	$(SDL_SRC) \
-	$(GTK_SRC)
-OBJS = $(SRC:.c=.o)
 
 ifeq ($(FULL_WARNINGS), no)
 EXTRA_WARNING_CFLAGS := -Wno-unused-function \
@@ -158,6 +98,43 @@ override CFLAGS := -std=gnu2x \
 	-I./src/ \
 	$(CFLAGS)
 
+# src/ui4x/libui4x ############################
+UI4X_DIR = src/ui4x
+UI4X_LDLIBS = -L$(UI4X_DIR) -lui4x
+
+libui4x:
+	make -C $(UI4X_DIR) libui4x.a WITH_SDL=$(WITH_SDL) WITH_SDL2=$(WITH_SDL2) LUA_VERSION=$(LUA_VERSION) VERSION_MAJOR=$(VERSION_MAJOR) VERSION_MINOR=$(VERSION_MINOR) PATCHLEVEL=$(PATCHLEVEL) DATADIR=$(DATADIR)
+
+clean-libui4x:
+	$(MAKE) -C $(UI4X_DIR) clean
+
+distclean-libui4x:
+	$(MAKE) -C $(UI4X_DIR) distclean
+
+override LDLIBS := $(LDLIBS) \
+	$(LUA_LDLIBS) \
+	$(GLIB2_LDLIBS) \
+	$(GTK_LDLIBS) \
+	$(NCURSES_LDLIBS) \
+	$(SDL_LDLIBS) \
+	-lz \
+	-lm \
+	$(UI4X_LDLIBS)
+
+SRC = src/options.c \
+	src/romio.c \
+	src/main.c \
+	src/core/debugger.c \
+	src/core/emulate.c \
+	src/core/init.c \
+	src/core/persistence.c \
+	src/core/memory.c \
+	src/core/registers.c \
+	src/core/timers.c \
+	src/core/serial.c \
+	src/emulator_api.c
+OBJS = $(SRC:.c=.o)
+
 depfiles = $(objects:.o=.d)
 
 # Have the compiler output dependency files with make targets for each
@@ -176,17 +153,17 @@ all: $(TARGETS)
 
 dist/x48ng-dump2rom: src/legacy_tools/dump2rom.o
 dist/x48ng-checkrom: src/legacy_tools/checkrom.o src/romio.o
-dist/x48ng: $(OBJS) $(HEADERS)
+dist/x48ng: $(OBJS) $(HEADERS) libui4x
 
 # Binaries
-$(TARGETS):
-	$(CC) $^ -o $@ $(CFLAGS) $(LDFLAGS) $(LIBS)
+$(TARGETS): libui4x
+	$(CC) $(OBJS) -o $@ $(CFLAGS) $(LDFLAGS) $(LDLIBS)
 
 # Cleaning
-clean:
+clean: clean-libui4x
 	rm -f $(OBJS) src/legacy_tools/*.o src/*.dep.mk src/legacy_tools/*.dep.mk
 
-mrproper: clean
+mrproper: clean distclean-libui4x
 	rm -f $(TARGETS)
 	make -C dist/ROMs mrproper
 

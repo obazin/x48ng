@@ -3533,7 +3533,7 @@ static void cmd_load( int argc, char** argv )
             free( tmp_saturn.port2 );
 
         /* After reloading state we need to refresh the UI's LCD */
-        ui_refresh_output();
+        ui4x_refresh_output();
     } else {
         printf( "Loading emulator-state from files failed.\n" );
         if ( saturn.rom )
@@ -3576,7 +3576,7 @@ static void cmd_exit( int argc, char** argv )
 
         save_before_exit = false;
         // please_exit = true;
-        exit_ui();
+        ui4x_exit();
         stop_emulator();
     }
 }
@@ -3588,7 +3588,7 @@ static void cmd_quit( int argc, char** argv )
 
         save_before_exit = true;
         // please_exit = true;
-        exit_ui();
+        ui4x_exit();
         stop_emulator();
     }
 }
@@ -4072,21 +4072,21 @@ int debug( void )
      */
     if ( !config.enable_debugger ) {
         if ( enter_debugger & ILLEGAL_INSTRUCTION ) {
-            if ( config.verbose )
+            if ( ui4x_config.verbose )
                 fprintf( stderr, "reset (illegal instruction at 0x%.5lX)\n", saturn.pc );
             saturn.pc = 0;
         }
         if ( enter_debugger & USER_INTERRUPT )
-            if ( config.verbose )
+            if ( ui4x_config.verbose )
                 printf( "usnterrupt (SIGINT) ignored\n" );
 
         // please_exit = true;
 
         if ( enter_debugger & BREAKPOINT_HIT )
-            if ( config.verbose )
+            if ( ui4x_config.verbose )
                 printf( "breakpoint hit at 0x%.5lX ignored\n", saturn.pc );
         if ( enter_debugger & TRAP_INSTRUCTION )
-            if ( config.verbose )
+            if ( ui4x_config.verbose )
                 printf( "trap instruction at 0x%.5lX ignored\n", saturn.pc );
 
         enter_debugger = 0;

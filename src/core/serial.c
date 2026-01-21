@@ -9,7 +9,7 @@
 #include <sys/time.h>
 
 #include "emulate.h"
-#include "options.h" /* config.verbose, config.enable_wire, config.enable_ir */
+#include "options.h" /* ui4x_config.verbose, config.enable_wire, config.enable_ir */
 #include "serial.h"
 
 static int wire_fd;
@@ -19,14 +19,14 @@ static int ttyp;
 static void update_connection_display( void )
 {
     if ( wire_fd == -1 ) {
-        if ( config.wire_name )
-            free( config.wire_name );
-        config.wire_name = ( char* )0;
+        if ( ui4x_config.wire_name )
+            free( ui4x_config.wire_name );
+        ui4x_config.wire_name = ( char* )0;
     }
     if ( ir_fd == -1 ) {
-        if ( config.ir_name )
-            free( config.ir_name );
-        config.ir_name = ( char* )0;
+        if ( ui4x_config.ir_name )
+            free( ui4x_config.ir_name );
+        ui4x_config.ir_name = ( char* )0;
     }
 }
 
@@ -49,9 +49,9 @@ int init_serial( void )
                 exit( -1 );
             }
             if ( ( ttyp = open( tty_dev_name, O_RDWR | O_NDELAY, 0666 ) ) >= 0 ) {
-                if ( config.verbose )
+                if ( ui4x_config.verbose )
                     printf( "wire connection on %s\n", tty_dev_name );
-                config.wire_name = strdup( tty_dev_name );
+                ui4x_config.wire_name = strdup( tty_dev_name );
             }
         }
         /* BSD PTY (Legacy) */
@@ -63,9 +63,9 @@ int init_serial( void )
                     if ( ( wire_fd = open( tty_dev_name, O_RDWR | O_EXCL | O_NDELAY, 0666 ) ) >= 0 ) {
                         ttyp = wire_fd;
                         sprintf( tty_dev_name, "/dev/tty%c%x", c, n );
-                        if ( config.verbose )
+                        if ( ui4x_config.verbose )
                             printf( "wire connection on %s\n", tty_dev_name );
-                        config.wire_name = strdup( tty_dev_name );
+                        ui4x_config.wire_name = strdup( tty_dev_name );
                         break;
                     }
                 }
@@ -81,7 +81,7 @@ int init_serial( void )
         if ( ioctl( ttyp, TCGETS, ( char* )&ttybuf ) < 0 )
 #endif
         {
-            if ( config.verbose )
+            if ( ui4x_config.verbose )
                 fprintf( stderr, "ioctl(wire, TCGETS) failed, errno = %d\n", errno );
             wire_fd = -1;
             ttyp = -1;
@@ -104,7 +104,7 @@ int init_serial( void )
         if ( ioctl( ttyp, TCSETS, ( char* )&ttybuf ) < 0 )
 #endif
         {
-            if ( config.verbose )
+            if ( ui4x_config.verbose )
                 fprintf( stderr, "ioctl(wire, TCSETS) failed, errno = %d\n", errno );
             wire_fd = -1;
             ttyp = -1;
@@ -115,9 +115,9 @@ int init_serial( void )
     if ( config.enable_ir ) {
         sprintf( tty_dev_name, "%s", config.ir_serial_device );
         if ( ( ir_fd = open( tty_dev_name, O_RDWR | O_NDELAY ) ) >= 0 ) {
-            if ( config.verbose )
+            if ( ui4x_config.verbose )
                 printf( "IR connection on %s\n", tty_dev_name );
-            config.ir_name = strdup( tty_dev_name );
+            ui4x_config.ir_name = strdup( tty_dev_name );
         }
     }
 
@@ -128,7 +128,7 @@ int init_serial( void )
         if ( ioctl( ir_fd, TCGETS, ( char* )&ttybuf ) < 0 )
 #endif
         {
-            if ( config.verbose )
+            if ( ui4x_config.verbose )
                 fprintf( stderr, "ioctl(IR, TCGETS) failed, errno = %d\n", errno );
             ir_fd = -1;
         }
@@ -150,7 +150,7 @@ int init_serial( void )
         if ( ioctl( ir_fd, TCSETS, ( char* )&ttybuf ) < 0 )
 #endif
         {
-            if ( config.verbose )
+            if ( ui4x_config.verbose )
                 fprintf( stderr, "ioctl(IR, TCSETS) failed, errno = %d\n", errno );
 
             ir_fd = -1;
@@ -172,7 +172,7 @@ void serial_baud( int baud )
         if ( ioctl( ir_fd, TCGETS, ( char* )&ttybuf ) < 0 )
 #endif
         {
-            if ( config.verbose )
+            if ( ui4x_config.verbose )
                 fprintf( stderr, "ioctl(IR,  TCGETS) failed, errno = %d\n", errno );
 
             ir_fd = -1;
@@ -228,7 +228,7 @@ void serial_baud( int baud )
 #else
     if ( ( ir_fd >= 0 ) && ( ( ttybuf.c_cflag & CBAUD ) == 0 ) ) {
 #endif
-        if ( config.verbose )
+        if ( ui4x_config.verbose )
             fprintf( stderr, "can\'t set baud rate, using 9600\n" );
 
         ttybuf.c_cflag |= B9600;
@@ -241,7 +241,7 @@ void serial_baud( int baud )
         if ( ioctl( ir_fd, TCSETS, ( char* )&ttybuf ) < 0 )
 #endif
         {
-            if ( config.verbose )
+            if ( ui4x_config.verbose )
                 fprintf( stderr, "ioctl(IR,  TCSETS) failed, errno = %d\n", errno );
 
             ir_fd = -1;
@@ -256,7 +256,7 @@ void serial_baud( int baud )
         if ( ioctl( ttyp, TCGETS, ( char* )&ttybuf ) < 0 )
 #endif
         {
-            if ( config.verbose )
+            if ( ui4x_config.verbose )
                 fprintf( stderr, "ioctl(wire, TCGETS) failed, errno = %d\n", errno );
 
             wire_fd = -1;
@@ -308,7 +308,7 @@ void transmit_char( void )
             if ( saturn.io_ctrl & 0x04 )
                 do_interupt();
         } else {
-            if ( errno != EAGAIN && config.verbose )
+            if ( errno != EAGAIN && ui4x_config.verbose )
                 fprintf( stderr, "serial write error: %d\n", errno );
 
             saturn.tcs &= 0x0e;

@@ -86,7 +86,7 @@ static config_t __config;
 
 void press_key( int hpkey )
 {
-    if ( hpkey < 0 || hpkey > ui_get_nb_keys() )
+    if ( hpkey < 0 || hpkey > ui4x_get_nb_keys() )
         return;
     // Check not already pressed (may be important: avoids a useless do_kbd_int)
     if ( KEYBOARD[ hpkey ].pressed )
@@ -112,7 +112,7 @@ void press_key( int hpkey )
 
 void release_key( int hpkey )
 {
-    if ( hpkey < 0 || hpkey > ui_get_nb_keys() )
+    if ( hpkey < 0 || hpkey > ui4x_get_nb_keys() )
         return;
     // Check not already released (not critical)
     if ( !KEYBOARD[ hpkey ].pressed )
@@ -129,7 +129,7 @@ void release_key( int hpkey )
 
 bool is_key_pressed( int hpkey )
 {
-    if ( hpkey < 0 || hpkey > ui_get_nb_keys() )
+    if ( hpkey < 0 || hpkey > ui4x_get_nb_keys() )
         return false;
 
     return KEYBOARD[ hpkey ].pressed;
@@ -165,7 +165,7 @@ void get_lcd_buffer( int* target )
     int x, y;
     Nibble v;
 
-    ( void )memset( target, 0, LCD_WIDTH * ui_get_lcd_height() );
+    ( void )memset( target, 0, LCD_WIDTH * ui4x_get_lcd_height() );
 
     /* Scan active display rows */
     for ( y = 0; y <= display.lines /* mod_status.hdw.lcd_vlc */; y++ ) {
@@ -183,7 +183,7 @@ void get_lcd_buffer( int* target )
 
     /* Scan menu display rows */
     addr = display.menu_start; // mod_status.hdw.lcd_menu_addr;
-    for ( ; y < ui_get_lcd_height(); y++ ) {
+    for ( ; y < ui4x_get_lcd_height(); y++ ) {
         /* Scan columns */
         for ( x = 0; x < NIBBLES_PER_ROW; x++ ) {
             v = bus_fetch_nibble( addr++ );
@@ -203,14 +203,15 @@ void init_emulator( config_t* conf )
 
     start_emulator();
 
-    conf->model = opt_gx ? MODEL_48GX : MODEL_48SX;
+    // conf->model = opt_gx ? MODEL_48GX : MODEL_48SX;
+    ui4x_config.model = opt_gx ? MODEL_48GX : MODEL_48SX;
 }
 
 void exit_emulator( void )
 {
     stop_emulator();
 
-    exit_ui();
+    ui4x_exit();
 
     exit( EXIT_SUCCESS );
 }

@@ -34,7 +34,7 @@ static int read_Byte( FILE* fp, Byte* var )
     unsigned char tmp;
 
     if ( fread( &tmp, 1, 1, fp ) != 1 ) {
-        if ( config.verbose )
+        if ( ui4x_config.verbose )
             fprintf( stderr, "can\'t read Byte\n" );
         return 0;
     }
@@ -47,7 +47,7 @@ static int read_char( FILE* fp, char* var )
     char tmp;
 
     if ( fread( &tmp, 1, 1, fp ) != 1 ) {
-        if ( config.verbose )
+        if ( ui4x_config.verbose )
             fprintf( stderr, "can\'t read char\n" );
         return 0;
     }
@@ -60,7 +60,7 @@ static int read_16( FILE* fp, word_16* var )
     unsigned char tmp[ 2 ];
 
     if ( fread( &tmp[ 0 ], 1, 2, fp ) != 2 ) {
-        if ( config.verbose )
+        if ( ui4x_config.verbose )
             fprintf( stderr, "can\'t read word_16\n" );
         return 0;
     }
@@ -74,7 +74,7 @@ static int read_32( FILE* fp, word_32* var )
     unsigned char tmp[ 4 ];
 
     if ( fread( &tmp[ 0 ], 1, 4, fp ) != 4 ) {
-        if ( config.verbose )
+        if ( ui4x_config.verbose )
             fprintf( stderr, "can\'t read word_32\n" );
         return 0;
     }
@@ -90,7 +90,7 @@ static int read_u_long( FILE* fp, unsigned long* var )
     unsigned char tmp[ 4 ];
 
     if ( fread( &tmp[ 0 ], 1, 4, fp ) != 4 ) {
-        if ( config.verbose )
+        if ( ui4x_config.verbose )
             fprintf( stderr, "can\'t read unsigned long\n" );
         return 0;
     }
@@ -276,13 +276,13 @@ static int read_mem_file( char* name, Nibble* mem, int size )
     int i, j;
 
     if ( NULL == ( fp = fopen( name, "r" ) ) ) {
-        if ( config.verbose )
+        if ( ui4x_config.verbose )
             fprintf( stderr, "ct open %s\n", name );
         return 0;
     }
 
     if ( stat( name, &st ) < 0 ) {
-        if ( config.verbose )
+        if ( ui4x_config.verbose )
             fprintf( stderr, "can\'t stat %s\n", name );
         return 0;
     }
@@ -292,7 +292,7 @@ static int read_mem_file( char* name, Nibble* mem, int size )
          * size is same as memory size, old version file
          */
         if ( fread( mem, 1, ( size_t )size, fp ) != ( unsigned long )size ) {
-            if ( config.verbose )
+            if ( ui4x_config.verbose )
                 fprintf( stderr, "can\'t read %s\n", name );
             fclose( fp );
             return 0;
@@ -303,7 +303,7 @@ static int read_mem_file( char* name, Nibble* mem, int size )
          */
 
         if ( st.st_size != size / 2 ) {
-            if ( config.verbose )
+            if ( ui4x_config.verbose )
                 fprintf( stderr, "strange size %s, expected %d, found %ld\n", name, size / 2, st.st_size );
             fclose( fp );
             return 0;
@@ -312,7 +312,7 @@ static int read_mem_file( char* name, Nibble* mem, int size )
         if ( NULL == ( tmp_mem = ( Byte* )malloc( ( size_t )st.st_size ) ) ) {
             for ( i = 0, j = 0; i < size / 2; i++ ) {
                 if ( 1 != fread( &byte, 1, 1, fp ) ) {
-                    if ( config.verbose )
+                    if ( ui4x_config.verbose )
                         fprintf( stderr, "can\'t read %s\n", name );
                     fclose( fp );
                     return 0;
@@ -322,7 +322,7 @@ static int read_mem_file( char* name, Nibble* mem, int size )
             }
         } else {
             if ( fread( tmp_mem, 1, ( size_t )size / 2, fp ) != ( unsigned long )( size / 2 ) ) {
-                if ( config.verbose )
+                if ( ui4x_config.verbose )
                     fprintf( stderr, "can\'t read %s\n", name );
                 fclose( fp );
                 free( tmp_mem );
@@ -340,7 +340,7 @@ static int read_mem_file( char* name, Nibble* mem, int size )
 
     fclose( fp );
 
-    if ( config.verbose )
+    if ( ui4x_config.verbose )
         printf( "read %s\n", name );
 
     return 1;
@@ -356,7 +356,7 @@ static int write_Byte( FILE* fp, Byte* var )
 
     tmp = *var;
     if ( fwrite( &tmp, 1, 1, fp ) != 1 ) {
-        if ( config.verbose )
+        if ( ui4x_config.verbose )
             fprintf( stderr, "can\'t write Byte\n" );
         return 0;
     }
@@ -369,7 +369,7 @@ static int write_char( FILE* fp, char* var )
 
     tmp = *var;
     if ( fwrite( &tmp, 1, 1, fp ) != 1 ) {
-        if ( config.verbose )
+        if ( ui4x_config.verbose )
             fprintf( stderr, "can\'t write char\n" );
         return 0;
     }
@@ -383,7 +383,7 @@ static int write_16( FILE* fp, word_16* var )
     tmp[ 0 ] = ( *var >> 8 ) & 0xff;
     tmp[ 1 ] = *var & 0xff;
     if ( fwrite( &tmp[ 0 ], 1, 2, fp ) != 2 ) {
-        if ( config.verbose )
+        if ( ui4x_config.verbose )
             fprintf( stderr, "can\'t write word_16\n" );
         return 0;
     }
@@ -399,7 +399,7 @@ static int write_32( FILE* fp, word_32* var )
     tmp[ 2 ] = ( *var >> 8 ) & 0xff;
     tmp[ 3 ] = *var & 0xff;
     if ( fwrite( &tmp[ 0 ], 1, 4, fp ) != 4 ) {
-        if ( config.verbose )
+        if ( ui4x_config.verbose )
             fprintf( stderr, "can\'t write word_32\n" );
         return 0;
     }
@@ -415,7 +415,7 @@ static int write_u_long( FILE* fp, unsigned long* var )
     tmp[ 2 ] = ( *var >> 8 ) & 0xff;
     tmp[ 3 ] = *var & 0xff;
     if ( fwrite( &tmp[ 0 ], 1, 4, fp ) != 4 ) {
-        if ( config.verbose )
+        if ( ui4x_config.verbose )
             fprintf( stderr, "can\'t write unsigned long\n" );
         return 0;
     }
@@ -430,7 +430,7 @@ static int write_mem_file( char* name, Nibble* mem, int size )
     int i, j;
 
     if ( NULL == ( fp = fopen( name, "w" ) ) ) {
-        if ( config.verbose )
+        if ( ui4x_config.verbose )
             fprintf( stderr, "can\'t open %s\n", name );
         return 0;
     }
@@ -440,7 +440,7 @@ static int write_mem_file( char* name, Nibble* mem, int size )
             byte = ( mem[ j++ ] & 0x0f );
             byte |= ( mem[ j++ ] << 4 ) & 0xf0;
             if ( 1 != fwrite( &byte, 1, 1, fp ) ) {
-                if ( config.verbose )
+                if ( ui4x_config.verbose )
                     fprintf( stderr, "can\'t write %s\n", name );
                 fclose( fp );
                 return 0;
@@ -453,7 +453,7 @@ static int write_mem_file( char* name, Nibble* mem, int size )
         }
 
         if ( fwrite( tmp_mem, 1, ( size_t )size / 2, fp ) != ( unsigned long )size / 2 ) {
-            if ( config.verbose )
+            if ( ui4x_config.verbose )
                 fprintf( stderr, "can\'t write %s\n", name );
             fclose( fp );
             free( tmp_mem );
@@ -465,7 +465,7 @@ static int write_mem_file( char* name, Nibble* mem, int size )
 
     fclose( fp );
 
-    if ( config.verbose )
+    if ( ui4x_config.verbose )
         printf( "wrote %s\n", name );
 
     return 1;
@@ -477,7 +477,7 @@ static int write_state_file( char* filename )
     FILE* fp;
 
     if ( ( fp = fopen( filename, "w" ) ) == NULL ) {
-        if ( config.verbose )
+        if ( ui4x_config.verbose )
             fprintf( stderr, "can\'t open %s, no saving done\n", filename );
         return 0;
     }
@@ -577,7 +577,7 @@ static int write_state_file( char* filename )
 
     fclose( fp );
 
-    if ( config.verbose )
+    if ( ui4x_config.verbose )
         printf( "wrote %s\n", filename );
 
     return 1;
@@ -594,7 +594,7 @@ int read_rom( const char* fname )
     if ( !read_rom_file( fname, &saturn.rom, &rom_size ) )
         return 0;
 
-    if ( config.verbose )
+    if ( ui4x_config.verbose )
         printf( "read %s\n", fname );
 
     dev_memory_init();
@@ -602,7 +602,7 @@ int read_rom( const char* fname )
     ram_size = opt_gx ? RAM_SIZE_GX : RAM_SIZE_SX;
 
     if ( NULL == ( saturn.ram = ( Nibble* )malloc( ram_size ) ) ) {
-        if ( config.verbose )
+        if ( ui4x_config.verbose )
             fprintf( stderr, "can\'t malloc RAM\n" );
         return 0;
     }
@@ -637,20 +637,20 @@ int read_files( void )
     /* 1. read ROM from ~/.x48ng/rom into saturn.rom */
     /*************************************************/
     saturn.rom = ( Nibble* )NULL;
-    if ( !read_rom_file( normalized_rom_path, &saturn.rom, &rom_size ) )
+    if ( !read_rom_file( ui4x_make_filename_absolute( (char*)"rom" ), &saturn.rom, &rom_size ) )
         return 0;
 
-    if ( config.verbose )
-        printf( "read %s\n", normalized_rom_path );
+    if ( ui4x_config.verbose )
+        printf( "read %s\n", ui4x_make_filename_absolute( (char*)"rom" ) );
 
     rom_is_new = false;
 
     /**************************************************/
     /* 2. read saved state from ~/.x48ng/state into fp */
     /**************************************************/
-    if ( NULL == ( fp = fopen( normalized_state_path, "r" ) ) ) {
-        if ( config.verbose )
-            fprintf( stderr, "can\'t open %s\n", normalized_state_path );
+    if ( NULL == ( fp = fopen( ui4x_make_filename_absolute( (char*)"state" ), "r" ) ) ) {
+        if ( ui4x_config.verbose )
+            fprintf( stderr, "can\'t open %s\n", ui4x_make_filename_absolute( (char*)"state" ) );
         return 0;
     }
 
@@ -673,7 +673,7 @@ int read_files( void )
         read_version = true;
         for ( i = 0; i < 4; i++ ) {
             if ( !read_char( fp, &saturn.version[ i ] ) ) {
-                if ( config.verbose )
+                if ( ui4x_config.verbose )
                     fprintf( stderr, "can\'t read version\n" );
                 read_version = false;
             }
@@ -692,11 +692,11 @@ int read_files( void )
              * try to read latest version file
              */
             if ( !read_state_file( fp ) ) {
-                if ( config.verbose )
-                    fprintf( stderr, "can't handle %s\n", normalized_state_path );
+                if ( ui4x_config.verbose )
+                    fprintf( stderr, "can't handle %s\n", ui4x_make_filename_absolute( (char*)"state" ) );
                 init_saturn();
-            } else if ( config.verbose )
-                printf( "read %s\n", normalized_state_path );
+            } else if ( ui4x_config.verbose )
+                printf( "read %s\n", ui4x_make_filename_absolute( (char*)"state" ) );
         }
     }
     fclose( fp );
@@ -709,7 +709,7 @@ int read_files( void )
 
     saturn.ram = ( Nibble* )NULL;
     if ( NULL == ( saturn.ram = ( Nibble* )malloc( ram_size ) ) ) {
-        if ( config.verbose )
+        if ( ui4x_config.verbose )
             fprintf( stderr, "can\'t malloc RAM[%d]\n", ram_size );
         exit( 1 );
     }
@@ -717,12 +717,12 @@ int read_files( void )
     /*************************************************/
     /* 3. read RAM from ~/.x48ng/ram into saturn.ram */
     /*************************************************/
-    if ( ( fp = fopen( normalized_ram_path, "r" ) ) == NULL ) {
-        if ( config.verbose )
-            fprintf( stderr, "can\'t open %s\n", normalized_ram_path );
+    if ( ( fp = fopen( ui4x_make_filename_absolute( (char*)"ram" ), "r" ) ) == NULL ) {
+        if ( ui4x_config.verbose )
+            fprintf( stderr, "can\'t open %s\n", ui4x_make_filename_absolute( (char*)"ram" ) );
         return 0;
     }
-    if ( !read_mem_file( normalized_ram_path, saturn.ram, ram_size ) )
+    if ( !read_mem_file( ui4x_make_filename_absolute( (char*)"ram" ), saturn.ram, ram_size ) )
         return 0;
 
     /**************************************/
@@ -738,13 +738,13 @@ int read_files( void )
     port1_is_ram = 0;
     saturn.port1 = ( unsigned char* )0;
 
-    if ( stat( normalized_port1_path, &st ) >= 0 ) {
+    if ( stat( ui4x_make_filename_absolute( (char*)"port1" ), &st ) >= 0 ) {
         port1_size = 2 * st.st_size;
         if ( ( port1_size == 0x10000 ) || ( port1_size == 0x40000 ) ) {
             if ( NULL == ( saturn.port1 = ( Nibble* )malloc( port1_size ) ) ) {
-                if ( config.verbose )
+                if ( ui4x_config.verbose )
                     fprintf( stderr, "can\'t malloc PORT1[%ld]\n", port1_size );
-            } else if ( !read_mem_file( normalized_port1_path, saturn.port1, port1_size ) ) {
+            } else if ( !read_mem_file( ui4x_make_filename_absolute( (char*)"port1" ), saturn.port1, port1_size ) ) {
                 port1_size = 0;
                 port1_is_ram = false;
             } else {
@@ -770,14 +770,14 @@ int read_files( void )
     port2_is_ram = false;
     saturn.port2 = ( unsigned char* )0;
 
-    if ( stat( normalized_port2_path, &st ) >= 0 ) {
+    if ( stat( ui4x_make_filename_absolute( (char*)"port2" ), &st ) >= 0 ) {
         port2_size = 2 * st.st_size;
         if ( ( opt_gx && ( ( port2_size % 0x40000 ) == 0 ) ) ||
              ( !opt_gx && ( ( port2_size == 0x10000 ) || ( port2_size == 0x40000 ) ) ) ) {
             if ( NULL == ( saturn.port2 = ( Nibble* )malloc( port2_size ) ) ) {
-                if ( config.verbose )
+                if ( ui4x_config.verbose )
                     fprintf( stderr, "can\'t malloc PORT2[%ld]\n", port2_size );
-            } else if ( !read_mem_file( normalized_port2_path, saturn.port2, port2_size ) ) {
+            } else if ( !read_mem_file( ui4x_make_filename_absolute( (char*)"port2" ), saturn.port2, port2_size ) ) {
                 port2_size = 0;
                 port2_is_ram = false;
             } else {
@@ -807,57 +807,57 @@ int write_files( void )
     bool make_dir = false;
     int ram_size = opt_gx ? RAM_SIZE_GX : RAM_SIZE_SX;
 
-    if ( stat( normalized_config_path, &st ) == -1 ) {
-        if ( errno == ENOENT ) {
-            make_dir = true;
-        } else {
-            if ( config.verbose )
-                fprintf( stderr, "can\'t stat %s, saving to /tmp\n", normalized_config_path );
-            strcpy( normalized_config_path, "/tmp" );
-        }
-    } else {
-        if ( !S_ISDIR( st.st_mode ) ) {
-            if ( config.verbose )
-                fprintf( stderr, "%s is no directory, saving to /tmp\n", normalized_config_path );
-            strcpy( normalized_config_path, "/tmp" );
-        }
-    }
+    /* if ( stat( normalized_config_path, &st ) == -1 ) { */
+    /*     if ( errno == ENOENT ) { */
+    /*         make_dir = true; */
+    /*     } else { */
+    /*         if ( ui4x_config.verbose ) */
+    /*             fprintf( stderr, "can\'t stat %s, saving to /tmp\n", normalized_config_path ); */
+    /*         strcpy( normalized_config_path, "/tmp" ); */
+    /*     } */
+    /* } else { */
+    /*     if ( !S_ISDIR( st.st_mode ) ) { */
+    /*         if ( ui4x_config.verbose ) */
+    /*             fprintf( stderr, "%s is no directory, saving to /tmp\n", normalized_config_path ); */
+    /*         strcpy( normalized_config_path, "/tmp" ); */
+    /*     } */
+    /* } */
 
-    if ( make_dir ) {
-        if ( mkdir( normalized_config_path, 0777 ) == -1 ) {
-            if ( config.verbose )
-                fprintf( stderr, "can\'t mkdir %s, saving to /tmp\n", normalized_config_path );
-            strcpy( normalized_config_path, "/tmp" );
-        }
-    }
+    /* if ( make_dir ) { */
+    /*     if ( mkdir( normalized_config_path, 0777 ) == -1 ) { */
+    /*         if ( ui4x_config.verbose ) */
+    /*             fprintf( stderr, "can\'t mkdir %s, saving to /tmp\n", normalized_config_path ); */
+    /*         strcpy( normalized_config_path, "/tmp" ); */
+    /*     } */
+    /* } */
 
-    if ( !write_state_file( normalized_state_path ) )
+    if ( !write_state_file( ui4x_make_filename_absolute( (char*)"state" ) ) )
         return 0;
 
     rom_is_new = make_dir;
     if ( rom_is_new ) {
-        char new_rom_path[ MAX_LENGTH_FILENAME ];
+        /* char new_rom_path[ MAX_LENGTH_FILENAME ]; */
 
-        strcpy( new_rom_path, normalized_config_path );
-        strcat( new_rom_path, "rom" );
+        /* strcpy( new_rom_path, normalized_config_path ); */
+        /* strcat( new_rom_path, "rom" ); */
 
-        if ( !write_mem_file( new_rom_path, saturn.rom, rom_size ) )
+        if ( !write_mem_file( ui4x_make_filename_absolute( (char*)"state" ), saturn.rom, rom_size ) )
             return 0;
 
-        if ( config.verbose )
-            printf( "wrote %s\n", new_rom_path );
+        /* if ( ui4x_config.verbose ) */
+        /*     printf( "wrote %s\n", new_rom_path ); */
     }
 
-    if ( !write_mem_file( normalized_ram_path, saturn.ram, ram_size ) )
+    if ( !write_mem_file( ui4x_make_filename_absolute( (char*)"ram" ), saturn.ram, ram_size ) )
         return 0;
 
     if ( ( port1_size > 0 ) && port1_is_ram ) {
-        if ( !write_mem_file( normalized_port1_path, saturn.port1, port1_size ) )
+        if ( !write_mem_file( ui4x_make_filename_absolute( (char*)"port1" ), saturn.port1, port1_size ) )
             return 0;
     }
 
     if ( ( port2_size > 0 ) && port2_is_ram ) {
-        if ( !write_mem_file( normalized_port2_path, saturn.port2, port2_size ) )
+        if ( !write_mem_file( ui4x_make_filename_absolute( (char*)"port2" ), saturn.port2, port2_size ) )
             return 0;
     }
 

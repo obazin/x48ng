@@ -335,6 +335,8 @@ config_t* config_init( int argc, char* argv[] )
                             "false)\n"
                             "     --inhibit-shutdown   __tentative fix for stuck-on-OFF bug__ (default: "
                             "false)\n";
+    opterr = false; /* handle unknown arg silently  */
+    optind = 0;     /* reset arg position to allow multiple parsing passes */
     while ( c != EOF ) {
         c = getopt_long( argc, argv, optstring, long_options, &option_index );
 

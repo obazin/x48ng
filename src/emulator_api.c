@@ -82,8 +82,6 @@ static hpkey_t keyboard48[ NB_HP48_KEYS ] = {
     {0x00,   false},
 };
 
-static config_t __config;
-
 void press_key( int hpkey )
 {
     if ( hpkey < 0 || hpkey > ui4x_get_nb_keys() )
@@ -197,13 +195,10 @@ void get_lcd_buffer( int* target )
 
 int get_contrast( void ) { return display.contrast; }
 
-void init_emulator( config_t* conf )
+void init_emulator( config_t* _conf )
 {
-    __config = *conf;
-
     start_emulator();
 
-    // conf->model = opt_gx ? MODEL_48GX : MODEL_48SX;
     ui4x_config.model = opt_gx ? MODEL_48GX : MODEL_48SX;
 }
 

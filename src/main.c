@@ -1,11 +1,8 @@
-#include <errno.h>
 #include <fcntl.h>
 #include <langinfo.h>
 #include <locale.h>
 #include <signal.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 
 #include <sys/time.h>
@@ -58,53 +55,11 @@ int main( int argc, char** argv )
        - hard-coded default values
      */
     /* First config pass, core x50ng parses argv */
-    // config_t __config = *config_init( argc, argv );
-    config = *config_init( argc, argv );
+    //config = *config_init( argc, argv );
 
     /********************/
     /* initialize stuff */
     /********************/
-
-    /* Emulator */
-    init_emulator( &config );
-
-    /* /\* (G)UI *\/ */
-    /* ui4x_config_t config_ui = { */
-    /*     .model = config.model, */
-    /*     .shiftless = config.shiftless, */
-    /*     .black_lcd = config.black_lcd, */
-    /*     .newrpl_keyboard = false, */
-
-    /*     .frontend = config.frontend, */
-
-    /*     .mono = config.mono, */
-    /*     .gray = config.gray, */
-
-    /*     .chromeless = config.chromeless, */
-    /*     .fullscreen = config.fullscreen, */
-
-    /*     .tiny = config.tiny, */
-    /*     .small = config.small, */
-
-    /*     .verbose = config.verbose, */
-
-    /*     .zoom = config.zoom, */
-
-    /*     .netbook = config.netbook, */
-    /*     .netbook_pivot_line = 3, */
-
-    /*     .name = config.progname, */
-    /*     .progname = config.progname, */
-    /*     .progpath = NULL, */
-
-    /*     .wire_name = config.wire_name, */
-    /*     .ir_name = config.ir_name, */
-
-    /*     .datadir = NULL, */
-    /*     .style_filename = ( char* )( config.model == MODEL_48GX ? "style-48gx.css" : "style-48sx.css" ), */
-
-    /*     .sd_dir = NULL, */
-    /* }; */
 
     ui4x_emulator_api_t emulator_api = {
         .press_key = press_key,
@@ -125,6 +80,9 @@ int main( int argc, char** argv )
         .do_debug = NULL,
     };
     ui4x_init( argc, argv, progname, progpath, default_datadir, &emulator_api );
+
+    /* Emulator */
+    init_emulator( &config );
 
     /*****************************************/
     /* handlers for SIGALRM, SIGPIPE */

@@ -1,4 +1,3 @@
-#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,7 +6,6 @@
 
 #include "emulate.h"
 #include "init.h"
-#include "options.h"
 #include "romio.h"
 #include "types.h"
 
@@ -589,13 +587,13 @@ static int write_state_file( char* filename )
 
 int read_rom( const char* fname )
 {
+    if ( ui4x_config.verbose )
+        printf( "read %s\n", fname );
+
     int ram_size;
 
     if ( !read_rom_file( fname, &saturn.rom, &rom_size ) )
         return 0;
-
-    if ( ui4x_config.verbose )
-        printf( "read %s\n", fname );
 
     dev_memory_init();
 

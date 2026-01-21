@@ -18,8 +18,9 @@
 
 #include "emulator_api.h"
 #include "options.h"
+#include "romio.h"
 
-config_t config;
+config_t x48ng_config;
 
 void signal_handler( int sig )
 {
@@ -54,8 +55,8 @@ int main( int argc, char** argv )
        - configuration file
        - hard-coded default values
      */
-    /* First config pass, core x50ng parses argv */
-    //config = *config_init( argc, argv );
+    /* First config pass, core x48ng parses argv */
+    x48ng_config = *config_init( argc, argv );
 
     /********************/
     /* initialize stuff */
@@ -82,7 +83,9 @@ int main( int argc, char** argv )
     ui4x_init( argc, argv, progname, progpath, default_datadir, &emulator_api );
 
     /* Emulator */
-    init_emulator( &config );
+    init_emulator( &x48ng_config );
+
+    ui4x_config.model = opt_gx ? MODEL_48GX : MODEL_48SX;
 
     /*****************************************/
     /* handlers for SIGALRM, SIGPIPE */
@@ -167,13 +170,13 @@ int main( int argc, char** argv )
         do {
             step_instruction();
 
-            if ( config.enable_debugger && ( exec_flags & EXEC_BKPT ) && check_breakpoint( BP_EXEC, saturn.pc ) ) {
+            if ( x48ng_config.enable_debugger && ( exec_flags & EXEC_BKPT ) && check_breakpoint( BP_EXEC, saturn.pc ) ) {
                 enter_debugger |= BREAKPOINT_HIT;
                 break;
             }
 
             for ( int i = 0; i < KEYS_BUFFER_SIZE; i++ )
-                if ( saturn.keybuf[ i ] || config.throttle ) {
+                if ( saturn.keybuf[ i ] || x48ng_config.throttle ) {
                     /* Throttling speed if needed */
                     gettimeofday( &tv, &tz );
                     gettimeofday( &tv2, &tz );

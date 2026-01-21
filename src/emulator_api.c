@@ -195,12 +195,7 @@ void get_lcd_buffer( int* target )
 
 int get_contrast( void ) { return display.contrast; }
 
-void init_emulator( config_t* _conf )
-{
-    start_emulator();
-
-    ui4x_config.model = opt_gx ? MODEL_48GX : MODEL_48SX;
-}
+void init_emulator( config_t* _conf ) { start_emulator(); }
 
 void exit_emulator( void )
 {

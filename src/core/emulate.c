@@ -1225,7 +1225,7 @@ static bool step_instruction_080( void )
             break;
         case 7: /* SHUTDN */
             saturn.pc += 3;
-            if ( config.inhibit_shutdown )
+            if ( x48ng_config.inhibit_shutdown )
                 break;
 
             stop_timer( RUN_TIMER );

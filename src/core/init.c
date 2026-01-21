@@ -99,7 +99,7 @@ void start_emulator( void )
 
     /* If files are successfully read => return and let's go */
     if ( read_files() ) {
-        if ( config.reset )
+        if ( x48ng_config.reset )
             saturn.pc = 0x00000;
     } else {
         /* if files were not readable => initialize */

@@ -39,7 +39,7 @@ int init_serial( void )
 
     wire_fd = -1;
     ttyp = -1;
-    if ( config.enable_wire ) {
+    if ( x48ng_config.enable_wire ) {
         /* Unix98 PTY (Preferred) */
         if ( ( wire_fd = open( "/dev/ptmx", O_RDWR | O_NONBLOCK, 0666 ) ) >= 0 ) {
             grantpt( wire_fd );
@@ -112,8 +112,8 @@ int init_serial( void )
     }
 
     ir_fd = -1;
-    if ( config.enable_ir ) {
-        sprintf( tty_dev_name, "%s", config.ir_serial_device );
+    if ( x48ng_config.enable_ir ) {
+        sprintf( tty_dev_name, "%s", x48ng_config.ir_serial_device );
         if ( ( ir_fd = open( tty_dev_name, O_RDWR | O_NDELAY ) ) >= 0 ) {
             if ( ui4x_config.verbose )
                 printf( "IR connection on %s\n", tty_dev_name );

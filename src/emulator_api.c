@@ -195,7 +195,7 @@ void get_lcd_buffer( int* target )
 
 int get_contrast( void ) { return display.contrast; }
 
-void init_emulator( config_t* _conf ) { start_emulator(); }
+void init_emulator( void ) { start_emulator(); }
 
 void exit_emulator( void )
 {

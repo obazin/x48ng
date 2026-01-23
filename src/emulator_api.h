@@ -14,7 +14,7 @@ extern bool get_display_state( void );
 extern void get_lcd_buffer( int* target );
 extern int get_contrast( void );
 
-extern void init_emulator( config_t* conf );
+extern void init_emulator( void );
 extern void exit_emulator( void );
 
 #endif /* EMULATOR_API_H */

@@ -83,7 +83,7 @@ int main( int argc, char** argv )
     ui4x_init( argc, argv, progname, progpath, default_datadir, &emulator_api );
 
     /* Emulator */
-    init_emulator( &x48ng_config );
+    init_emulator();
 
     ui4x_config.model = opt_gx ? MODEL_48GX : MODEL_48SX;
 

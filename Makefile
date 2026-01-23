@@ -111,6 +111,10 @@ clean-libui4x:
 distclean-libui4x:
 	$(MAKE) -C $(UI4X_DIR) distclean
 
+pull-ui4x:
+	git submodule update --recursive --remote
+#######################
+
 override LDLIBS := $(LDLIBS) \
 	$(LUA_LDLIBS) \
 	$(GLIB2_LDLIBS) \

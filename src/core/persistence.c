@@ -484,7 +484,7 @@ static int write_state_file( char* filename )
     /*
      * write the state config file
      */
-    write_32( fp, ( word_32* )&saturn.magic );
+    write_u_long( fp, &saturn.magic );
     for ( i = 0; i < 3; i++ )
         write_char( fp, &saturn.version[ i ] );
     for ( i = 0; i < 16; i++ )

@@ -60,21 +60,11 @@ static char* config_to_string( void )
 
 config_t* config_init( int argc, char* argv[] )
 {
-    /* temporary variables for filenames later treated with ui4x_make_filename_absolute() */
-    char* bootloader_filename = NULL;
-    char* firmware_filename = NULL;
-
     /***************************/
     /* 1. command-line options */
     /***************************/
     /* The cli options are temporaly stored in their clopt_* variables */
     int clopt_print_config_and_exit = false;
-
-    /* specific */
-    bool clopt_do_enable_debugger = false;
-    bool clopt_do_start_debugger = false;
-    bool clopt_do_flash = false;
-    bool clopt_do_flash_full = false;
 
     const char* optstring = "hvVrtsT";
     struct option long_options[] = {

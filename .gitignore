@@ -1,6 +1,11 @@
 *.o
 
 dist/ROMs/?xrom-?
-dist/x48ng*
+dist/x48ng
+dist/x48ng.man.1
+dist/x48ng.desktop
+dist/x48ng-checkrom
+dist/x48ng-dumprom
+dist/x48ng-mkcard
 /compile_commands.json
 /.depend

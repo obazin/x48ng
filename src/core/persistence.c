@@ -477,7 +477,7 @@ static int write_state_file( char* filename )
 
     if ( ( fp = fopen( filename, "w" ) ) == NULL ) {
         if ( ui4x_config.verbose )
-            fprintf( stderr, "can\'t open %s, no saving done\n", filename );
+            fprintf( stderr, "can\'t open %s, state not saved!\n", filename );
         return 0;
     }
 

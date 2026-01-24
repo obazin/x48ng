@@ -5,9 +5,9 @@
 #include <sys/time.h>
 
 #include "emulate.h"
-#include "persistence.h"
 #include "memory.h"
 #include "options.h"
+#include "persistence.h"
 #include "romio.h"
 #include "types.h"
 #include "ui4x/src/api.h"
@@ -727,17 +727,17 @@ static Nibble read_nibble_gx( Address addr )
                     return saturn.ram[ addr - 0x80000 ];
             return saturn.rom[ addr ];
         case 0xa:
-            if (( saturn.mem_cntl[ MCTL_SysRAM_GX ].config[ 0 ] == 0x80000 )
-                && ( saturn.mem_cntl[ MCTL_SysRAM_GX ].config[ 1 ] == 0xc0000 ))
-                    return saturn.ram[ addr - 0x80000 ];
+            if ( ( saturn.mem_cntl[ MCTL_SysRAM_GX ].config[ 0 ] == 0x80000 ) &&
+                 ( saturn.mem_cntl[ MCTL_SysRAM_GX ].config[ 1 ] == 0xc0000 ) )
+                return saturn.ram[ addr - 0x80000 ];
             if ( saturn.mem_cntl[ MCTL_PORT1_GX ].config[ 0 ] == 0xa0000 )
                 return saturn.port1[ ( addr - 0xa0000 ) & port1_mask ];
 
             return saturn.rom[ addr ];
         case 0xb:
-            if (( saturn.mem_cntl[ MCTL_SysRAM_GX ].config[ 0 ] == 0x80000 )
-                && ( saturn.mem_cntl[ MCTL_SysRAM_GX ].config[ 1 ] == 0xc0000 ))
-                    return saturn.ram[ addr - 0x80000 ];
+            if ( ( saturn.mem_cntl[ MCTL_SysRAM_GX ].config[ 0 ] == 0x80000 ) &&
+                 ( saturn.mem_cntl[ MCTL_SysRAM_GX ].config[ 1 ] == 0xc0000 ) )
+                return saturn.ram[ addr - 0x80000 ];
             if ( saturn.mem_cntl[ MCTL_PORT2_GX ].config[ 0 ] == 0xb0000 ) {
                 return saturn.port2[ ( ( saturn.bank_switch << 18 ) + ( addr - 0xb0000 ) ) & port2_mask ];
                 /*
@@ -779,23 +779,23 @@ static Nibble read_nibble_gx( Address addr )
             if ( saturn.mem_cntl[ MCTL_SysRAM_GX ].config[ 0 ] == 0xc0000 )
                 if ( saturn.mem_cntl[ MCTL_SysRAM_GX ].config[ 1 ] == 0xc0000 )
                     return saturn.ram[ addr - 0xc0000 ];
-            if (( saturn.mem_cntl[ MCTL_PORT1_GX ].config[ 0 ] == 0xc0000 )
-                && ( saturn.mem_cntl[ MCTL_PORT1_GX ].config[ 1 ] == 0xc0000 ) )
-                    return saturn.port1[ ( addr - 0xc0000 ) & port1_mask ];
+            if ( ( saturn.mem_cntl[ MCTL_PORT1_GX ].config[ 0 ] == 0xc0000 ) &&
+                 ( saturn.mem_cntl[ MCTL_PORT1_GX ].config[ 1 ] == 0xc0000 ) )
+                return saturn.port1[ ( addr - 0xc0000 ) & port1_mask ];
 
-            if (( saturn.mem_cntl[ MCTL_PORT2_GX ].config[ 0 ] == 0xc0000 )
-                && ( saturn.mem_cntl[ MCTL_PORT2_GX ].config[ 1 ] == 0xc0000 )) {
-                    return saturn.port2[ ( ( saturn.bank_switch << 18 ) + ( addr - 0xc0000 ) ) & port2_mask ];
-                    /*
-                                  if (port2_size > (saturn.bank_switch << 18))
-                                    {
-                                      return saturn.port2[(saturn.bank_switch <<
-                       18)
-                                                          + (addr - 0xc0000)];
-                                    }
-                                  return 0x00;
-                    */
-                }
+            if ( ( saturn.mem_cntl[ MCTL_PORT2_GX ].config[ 0 ] == 0xc0000 ) &&
+                 ( saturn.mem_cntl[ MCTL_PORT2_GX ].config[ 1 ] == 0xc0000 ) ) {
+                return saturn.port2[ ( ( saturn.bank_switch << 18 ) + ( addr - 0xc0000 ) ) & port2_mask ];
+                /*
+                              if (port2_size > (saturn.bank_switch << 18))
+                                {
+                                  return saturn.port2[(saturn.bank_switch <<
+                   18)
+                                                      + (addr - 0xc0000)];
+                                }
+                              return 0x00;
+                */
+            }
             return saturn.rom[ addr ];
     }
     return 0x00;
@@ -933,17 +933,17 @@ static int read_nibble_crc_gx( Address addr )
                     return calc_crc( saturn.ram[ addr - 0x80000 ] );
             return calc_crc( saturn.rom[ addr ] );
         case 0xa:
-            if (( saturn.mem_cntl[ MCTL_SysRAM_GX ].config[ 0 ] == 0x80000 )
-                && ( saturn.mem_cntl[ MCTL_SysRAM_GX ].config[ 1 ] == 0xc0000 ))
-                    return calc_crc( saturn.ram[ addr - 0x80000 ] );
+            if ( ( saturn.mem_cntl[ MCTL_SysRAM_GX ].config[ 0 ] == 0x80000 ) &&
+                 ( saturn.mem_cntl[ MCTL_SysRAM_GX ].config[ 1 ] == 0xc0000 ) )
+                return calc_crc( saturn.ram[ addr - 0x80000 ] );
             if ( saturn.mem_cntl[ MCTL_PORT1_GX ].config[ 0 ] == 0xa0000 )
                 return calc_crc( saturn.port1[ ( addr - 0xa0000 ) & port1_mask ] );
 
             return calc_crc( saturn.rom[ addr ] );
         case 0xb:
-            if (( saturn.mem_cntl[ MCTL_SysRAM_GX ].config[ 0 ] == 0x80000 )
-                && ( saturn.mem_cntl[ MCTL_SysRAM_GX ].config[ 1 ] == 0xc0000 ))
-                    return calc_crc( saturn.ram[ addr - 0x80000 ] );
+            if ( ( saturn.mem_cntl[ MCTL_SysRAM_GX ].config[ 0 ] == 0x80000 ) &&
+                 ( saturn.mem_cntl[ MCTL_SysRAM_GX ].config[ 1 ] == 0xc0000 ) )
+                return calc_crc( saturn.ram[ addr - 0x80000 ] );
             if ( saturn.mem_cntl[ MCTL_PORT2_GX ].config[ 0 ] == 0xb0000 ) {
                 return calc_crc( saturn.port2[ ( ( saturn.bank_switch << 18 ) + ( addr - 0xb0000 ) ) & port2_mask ] );
                 /*
@@ -989,24 +989,24 @@ static int read_nibble_crc_gx( Address addr )
             if ( saturn.mem_cntl[ MCTL_SysRAM_GX ].config[ 0 ] == 0xc0000 )
                 if ( saturn.mem_cntl[ MCTL_SysRAM_GX ].config[ 1 ] == 0xc0000 )
                     return calc_crc( saturn.ram[ addr - 0xc0000 ] );
-            if (( saturn.mem_cntl[ MCTL_PORT1_GX ].config[ 0 ] == 0xc0000 )
-                && ( saturn.mem_cntl[ MCTL_PORT1_GX ].config[ 1 ] == 0xc0000 ) )
-                    return calc_crc( saturn.port1[ ( addr - 0xc0000 ) & port1_mask ] );
+            if ( ( saturn.mem_cntl[ MCTL_PORT1_GX ].config[ 0 ] == 0xc0000 ) &&
+                 ( saturn.mem_cntl[ MCTL_PORT1_GX ].config[ 1 ] == 0xc0000 ) )
+                return calc_crc( saturn.port1[ ( addr - 0xc0000 ) & port1_mask ] );
 
-            if (( saturn.mem_cntl[ MCTL_PORT2_GX ].config[ 0 ] == 0xc0000 )
-                && ( saturn.mem_cntl[ MCTL_PORT2_GX ].config[ 1 ] == 0xc0000 )) {
-                    return calc_crc( saturn.port2[ ( ( saturn.bank_switch << 18 ) + ( addr - 0xc0000 ) ) & port2_mask ] );
-                    /*
-                                  if (port2_size > (saturn.bank_switch << 18))
-                                    {
-                                      return
-                       calc_crc(saturn.port2[(saturn.bank_switch << 18)
-                                                                   + (addr -
-                       0xc0000)]);
-                                    }
-                                  return 0x00;
-                    */
-                }
+            if ( ( saturn.mem_cntl[ MCTL_PORT2_GX ].config[ 0 ] == 0xc0000 ) &&
+                 ( saturn.mem_cntl[ MCTL_PORT2_GX ].config[ 1 ] == 0xc0000 ) ) {
+                return calc_crc( saturn.port2[ ( ( saturn.bank_switch << 18 ) + ( addr - 0xc0000 ) ) & port2_mask ] );
+                /*
+                              if (port2_size > (saturn.bank_switch << 18))
+                                {
+                                  return
+                   calc_crc(saturn.port2[(saturn.bank_switch << 18)
+                                                               + (addr -
+                   0xc0000)]);
+                                }
+                              return 0x00;
+                */
+            }
             return calc_crc( saturn.rom[ addr ] );
     }
     return 0x00;

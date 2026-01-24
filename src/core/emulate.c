@@ -142,7 +142,6 @@ static inline void clear_register_bit( unsigned char* reg, int n ) { reg[ n / 4 
 
 static inline int get_register_bit( unsigned char* reg, int n ) { return ( ( int )( reg[ n / 4 ] & ( 1 << ( n % 4 ) ) ) > 0 ) ? 1 : 0; }
 
-
 static inline void load_constant( unsigned char* reg, int n, Address addr )
 {
     int p = saturn.p;
@@ -595,67 +594,67 @@ static bool step_instruction_013( void )
     switch ( bus_fetch_nibble( saturn.pc + 2 ) ) {
         case 0: /* D0=A */
             saturn.pc += 3;
-            register_to_address( saturn.reg[ A ], &saturn.d[0], 0 );
+            register_to_address( saturn.reg[ A ], &saturn.d[ 0 ], 0 );
             break;
         case 1: /* D1=A */
             saturn.pc += 3;
-            register_to_address( saturn.reg[ A ], &saturn.d[1], 0 );
+            register_to_address( saturn.reg[ A ], &saturn.d[ 1 ], 0 );
             break;
         case 2: /* AD0EX */
             saturn.pc += 3;
-            exchange_reg( saturn.reg[ A ], &saturn.d[0], A_FIELD );
+            exchange_reg( saturn.reg[ A ], &saturn.d[ 0 ], A_FIELD );
             break;
         case 3: /* AD1EX */
             saturn.pc += 3;
-            exchange_reg( saturn.reg[ A ], &saturn.d[1], A_FIELD );
+            exchange_reg( saturn.reg[ A ], &saturn.d[ 1 ], A_FIELD );
             break;
         case 4: /* D0=C */
             saturn.pc += 3;
-            register_to_address( saturn.reg[ C ], &saturn.d[0], 0 );
+            register_to_address( saturn.reg[ C ], &saturn.d[ 0 ], 0 );
             break;
         case 5: /* D1=C */
             saturn.pc += 3;
-            register_to_address( saturn.reg[ C ], &saturn.d[1], 0 );
+            register_to_address( saturn.reg[ C ], &saturn.d[ 1 ], 0 );
             break;
         case 6: /* CD0EX */
             saturn.pc += 3;
-            exchange_reg( saturn.reg[ C ], &saturn.d[0], A_FIELD );
+            exchange_reg( saturn.reg[ C ], &saturn.d[ 0 ], A_FIELD );
             break;
         case 7: /* CD1EX */
             saturn.pc += 3;
-            exchange_reg( saturn.reg[ C ], &saturn.d[1], A_FIELD );
+            exchange_reg( saturn.reg[ C ], &saturn.d[ 1 ], A_FIELD );
             break;
         case 8: /* D0=AS */
             saturn.pc += 3;
-            register_to_address( saturn.reg[ A ], &saturn.d[0], 1 );
+            register_to_address( saturn.reg[ A ], &saturn.d[ 0 ], 1 );
             break;
         case 9: /* saturn.d[1]=AS */
             saturn.pc += 3;
-            register_to_address( saturn.reg[ A ], &saturn.d[1], 1 );
+            register_to_address( saturn.reg[ A ], &saturn.d[ 1 ], 1 );
             break;
         case 0xa: /* AD0XS */
             saturn.pc += 3;
-            exchange_reg( saturn.reg[ A ], &saturn.d[0], IN_FIELD );
+            exchange_reg( saturn.reg[ A ], &saturn.d[ 0 ], IN_FIELD );
             break;
         case 0xb: /* AD1XS */
             saturn.pc += 3;
-            exchange_reg( saturn.reg[ A ], &saturn.d[1], IN_FIELD );
+            exchange_reg( saturn.reg[ A ], &saturn.d[ 1 ], IN_FIELD );
             break;
         case 0xc: /* D0=CS */
             saturn.pc += 3;
-            register_to_address( saturn.reg[ C ], &saturn.d[0], 1 );
+            register_to_address( saturn.reg[ C ], &saturn.d[ 0 ], 1 );
             break;
         case 0xd: /* D1=CS */
             saturn.pc += 3;
-            register_to_address( saturn.reg[ C ], &saturn.d[1], 1 );
+            register_to_address( saturn.reg[ C ], &saturn.d[ 1 ], 1 );
             break;
         case 0xe: /* CD0XS */
             saturn.pc += 3;
-            exchange_reg( saturn.reg[ C ], &saturn.d[0], IN_FIELD );
+            exchange_reg( saturn.reg[ C ], &saturn.d[ 0 ], IN_FIELD );
             break;
         case 0xf: /* CD1XS */
             saturn.pc += 3;
-            exchange_reg( saturn.reg[ C ], &saturn.d[1], IN_FIELD );
+            exchange_reg( saturn.reg[ C ], &saturn.d[ 1 ], IN_FIELD );
             break;
         default:
             illegal_instruction = true;
@@ -673,35 +672,35 @@ static bool step_instruction_014( void )
     switch ( op3 & 7 ) {
         case 0: /* DAT0=A */
             saturn.pc += 3;
-            store( saturn.d[0], saturn.reg[ A ], opX );
+            store( saturn.d[ 0 ], saturn.reg[ A ], opX );
             break;
         case 1: /* DAT1=A */
             saturn.pc += 3;
-            store( saturn.d[1], saturn.reg[ A ], opX );
+            store( saturn.d[ 1 ], saturn.reg[ A ], opX );
             break;
         case 2: /* A=DAT0 */
             saturn.pc += 3;
-            recall( saturn.reg[ A ], saturn.d[0], opX );
+            recall( saturn.reg[ A ], saturn.d[ 0 ], opX );
             break;
         case 3: /* A=DAT1 */
             saturn.pc += 3;
-            recall( saturn.reg[ A ], saturn.d[1], opX );
+            recall( saturn.reg[ A ], saturn.d[ 1 ], opX );
             break;
         case 4: /* DAT0=C */
             saturn.pc += 3;
-            store( saturn.d[0], saturn.reg[ C ], opX );
+            store( saturn.d[ 0 ], saturn.reg[ C ], opX );
             break;
         case 5: /* DAT1=C */
             saturn.pc += 3;
-            store( saturn.d[1], saturn.reg[ C ], opX );
+            store( saturn.d[ 1 ], saturn.reg[ C ], opX );
             break;
         case 6: /* C=DAT0 */
             saturn.pc += 3;
-            recall( saturn.reg[ C ], saturn.d[0], opX );
+            recall( saturn.reg[ C ], saturn.d[ 0 ], opX );
             break;
         case 7: /* C=DAT1 */
             saturn.pc += 3;
-            recall( saturn.reg[ C ], saturn.d[1], opX );
+            recall( saturn.reg[ C ], saturn.d[ 1 ], opX );
             break;
         default:
             illegal_instruction = true;
@@ -720,35 +719,35 @@ static bool step_instruction_015( void )
         switch ( op3 & 7 ) {
             case 0: /* DAT0=A */
                 saturn.pc += 4;
-                store_n( saturn.d[0], saturn.reg[ A ], op4 + 1 );
+                store_n( saturn.d[ 0 ], saturn.reg[ A ], op4 + 1 );
                 break;
             case 1: /* DAT1=A */
                 saturn.pc += 4;
-                store_n( saturn.d[1], saturn.reg[ A ], op4 + 1 );
+                store_n( saturn.d[ 1 ], saturn.reg[ A ], op4 + 1 );
                 break;
             case 2: /* A=DAT0 */
                 saturn.pc += 4;
-                recall_n( saturn.reg[ A ], saturn.d[0], op4 + 1 );
+                recall_n( saturn.reg[ A ], saturn.d[ 0 ], op4 + 1 );
                 break;
             case 3: /* A=DAT1 */
                 saturn.pc += 4;
-                recall_n( saturn.reg[ A ], saturn.d[1], op4 + 1 );
+                recall_n( saturn.reg[ A ], saturn.d[ 1 ], op4 + 1 );
                 break;
             case 4: /* DAT0=C */
                 saturn.pc += 4;
-                store_n( saturn.d[0], saturn.reg[ C ], op4 + 1 );
+                store_n( saturn.d[ 0 ], saturn.reg[ C ], op4 + 1 );
                 break;
             case 5: /* DAT1=C */
                 saturn.pc += 4;
-                store_n( saturn.d[1], saturn.reg[ C ], op4 + 1 );
+                store_n( saturn.d[ 1 ], saturn.reg[ C ], op4 + 1 );
                 break;
             case 6: /* C=DAT0 */
                 saturn.pc += 4;
-                recall_n( saturn.reg[ C ], saturn.d[0], op4 + 1 );
+                recall_n( saturn.reg[ C ], saturn.d[ 0 ], op4 + 1 );
                 break;
             case 7: /* C=DAT1 */
                 saturn.pc += 4;
-                recall_n( saturn.reg[ C ], saturn.d[1], op4 + 1 );
+                recall_n( saturn.reg[ C ], saturn.d[ 1 ], op4 + 1 );
                 break;
             default:
                 illegal_instruction = true;
@@ -757,35 +756,35 @@ static bool step_instruction_015( void )
         switch ( op3 ) {
             case 0: /* DAT0=A */
                 saturn.pc += 4;
-                store( saturn.d[0], saturn.reg[ A ], op4 );
+                store( saturn.d[ 0 ], saturn.reg[ A ], op4 );
                 break;
             case 1: /* DAT1=A */
                 saturn.pc += 4;
-                store( saturn.d[1], saturn.reg[ A ], op4 );
+                store( saturn.d[ 1 ], saturn.reg[ A ], op4 );
                 break;
             case 2: /* A=DAT0 */
                 saturn.pc += 4;
-                recall( saturn.reg[ A ], saturn.d[0], op4 );
+                recall( saturn.reg[ A ], saturn.d[ 0 ], op4 );
                 break;
             case 3: /* A=DAT1 */
                 saturn.pc += 4;
-                recall( saturn.reg[ A ], saturn.d[1], op4 );
+                recall( saturn.reg[ A ], saturn.d[ 1 ], op4 );
                 break;
             case 4: /* DAT0=C */
                 saturn.pc += 4;
-                store( saturn.d[0], saturn.reg[ C ], op4 );
+                store( saturn.d[ 0 ], saturn.reg[ C ], op4 );
                 break;
             case 5: /* DAT1=C */
                 saturn.pc += 4;
-                store( saturn.d[1], saturn.reg[ C ], op4 );
+                store( saturn.d[ 1 ], saturn.reg[ C ], op4 );
                 break;
             case 6: /* C=DAT0 */
                 saturn.pc += 4;
-                recall( saturn.reg[ C ], saturn.d[0], op4 );
+                recall( saturn.reg[ C ], saturn.d[ 0 ], op4 );
                 break;
             case 7: /* C=DAT1 */
                 saturn.pc += 4;
-                recall( saturn.reg[ C ], saturn.d[1], op4 );
+                recall( saturn.reg[ C ], saturn.d[ 1 ], op4 );
                 break;
             default:
                 illegal_instruction = true;
@@ -822,45 +821,45 @@ static bool step_instruction_01( void )
         case 6:
             op3 = bus_fetch_nibble( saturn.pc + 2 );
             saturn.pc += 3;
-            add_address( &saturn.d[0], op3 + 1 );
+            add_address( &saturn.d[ 0 ], op3 + 1 );
             break;
         case 7:
             op3 = bus_fetch_nibble( saturn.pc + 2 );
             saturn.pc += 3;
-            add_address( &saturn.d[1], op3 + 1 );
+            add_address( &saturn.d[ 1 ], op3 + 1 );
             break;
         case 8:
             op3 = bus_fetch_nibble( saturn.pc + 2 );
             saturn.pc += 3;
-            add_address( &saturn.d[0], -( op3 + 1 ) );
+            add_address( &saturn.d[ 0 ], -( op3 + 1 ) );
             break;
         case 9:
-            load_addr( &saturn.d[0], saturn.pc + 2, 2 );
+            load_addr( &saturn.d[ 0 ], saturn.pc + 2, 2 );
             saturn.pc += 4;
             break;
         case 0xa:
-            load_addr( &saturn.d[0], saturn.pc + 2, 4 );
+            load_addr( &saturn.d[ 0 ], saturn.pc + 2, 4 );
             saturn.pc += 6;
             break;
         case 0xb:
-            load_addr( &saturn.d[0], saturn.pc + 2, 5 );
+            load_addr( &saturn.d[ 0 ], saturn.pc + 2, 5 );
             saturn.pc += 7;
             break;
         case 0xc:
             op3 = bus_fetch_nibble( saturn.pc + 2 );
             saturn.pc += 3;
-            add_address( &saturn.d[1], -( op3 + 1 ) );
+            add_address( &saturn.d[ 1 ], -( op3 + 1 ) );
             break;
         case 0xd:
-            load_addr( &saturn.d[1], saturn.pc + 2, 2 );
+            load_addr( &saturn.d[ 1 ], saturn.pc + 2, 2 );
             saturn.pc += 4;
             break;
         case 0xe:
-            load_addr( &saturn.d[1], saturn.pc + 2, 4 );
+            load_addr( &saturn.d[ 1 ], saturn.pc + 2, 4 );
             saturn.pc += 6;
             break;
         case 0xf:
-            load_addr( &saturn.d[1], saturn.pc + 2, 5 );
+            load_addr( &saturn.d[ 1 ], saturn.pc + 2, 5 );
             saturn.pc += 7;
             break;
         default:
@@ -1105,7 +1104,9 @@ static bool step_instruction_0808( void )
         case 0xa: /* ?CBIT=0 */
         case 0xb: /* ?CBIT=1 */
             op5 = bus_fetch_nibble( saturn.pc + 4 );
-            saturn.carry = ( get_register_bit( ( op4 < 8 ) ? saturn.reg[ A ] : saturn.reg[ C ], op5 ) == ( ( op4 == 6 || op4 == 0xa ) ? 0 : 1 ) ) ? 1 : 0;
+            saturn.carry =
+                ( get_register_bit( ( op4 < 8 ) ? saturn.reg[ A ] : saturn.reg[ C ], op5 ) == ( ( op4 == 6 || op4 == 0xa ) ? 0 : 1 ) ) ? 1
+                                                                                                                                       : 0;
             if ( saturn.carry ) {
                 saturn.pc += 5;
                 int op6 = read_nibbles( saturn.pc, 2 );

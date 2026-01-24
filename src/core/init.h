@@ -3,7 +3,7 @@
 
 #  include <stdbool.h>
 
-#define X48_MAGIC 0x48503438
+#  define X48_MAGIC 0x48503438
 
 extern bool save_before_exit;
 

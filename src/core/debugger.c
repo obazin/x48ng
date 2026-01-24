@@ -3674,8 +3674,8 @@ static void dump_hst( void )
         hst |= 3;
     if ( saturn.st[ MP ] != 0 )
         hst |= 4;
-    printf( "   HST:\t%.1X    (%s%s%s%s)\n", hst, saturn.st[ MP ] ? "MP " : "-- ", saturn.st[ SR ] ? "SR " : "-- ", saturn.st[ SB ] ? "SB " : "-- ",
-            saturn.st[ XM ] ? "XM" : "--" );
+    printf( "   HST:\t%.1X    (%s%s%s%s)\n", hst, saturn.st[ MP ] ? "MP " : "-- ", saturn.st[ SR ] ? "SR " : "-- ",
+            saturn.st[ SB ] ? "SB " : "-- ", saturn.st[ XM ] ? "XM" : "--" );
 }
 
 static const char* mctl_str_gx[] = { "MMIO       ", "SysRAM     ", "Bank Switch", "Port 1     ", "Port 2     ", "SysROM     " };
@@ -3714,14 +3714,14 @@ static void cmd_regs( int argc, char** argv )
         dump_reg( "     B", 16, saturn.reg[ B ] );
         dump_reg( "     C", 16, saturn.reg[ C ] );
         dump_reg( "     D", 16, saturn.reg[ D ] );
-        printf( "    D0:\t%.5lX ->", saturn.d[0] );
+        printf( "    D0:\t%.5lX ->", saturn.d[ 0 ] );
         for ( i = 0; i < 20; i += 5 ) {
-            printf( " %s", str_nibbles( saturn.d[0] + i, 5 ) );
+            printf( " %s", str_nibbles( saturn.d[ 0 ] + i, 5 ) );
         }
         printf( "\n" );
-        printf( "    D1:\t%.5lX ->", saturn.d[1] );
+        printf( "    D1:\t%.5lX ->", saturn.d[ 1 ] );
         for ( i = 0; i < 20; i += 5 ) {
-            printf( " %s", str_nibbles( saturn.d[1] + i, 5 ) );
+            printf( " %s", str_nibbles( saturn.d[ 1 ] + i, 5 ) );
         }
         printf( "\n" );
         printf( "     P:\t%.1X\n", saturn.p );
@@ -3751,15 +3751,15 @@ static void cmd_regs( int argc, char** argv )
         } else if ( !strcmp( "D", argv[ 1 ] ) ) {
             dump_reg( "     D", 16, saturn.reg[ D ] );
         } else if ( !strcmp( "D0", argv[ 1 ] ) ) {
-            printf( "    D0:\t%.5lX ->", saturn.d[0] );
+            printf( "    D0:\t%.5lX ->", saturn.d[ 0 ] );
             for ( i = 0; i < 20; i += 5 ) {
-                printf( " %s", str_nibbles( saturn.d[0] + i, 5 ) );
+                printf( " %s", str_nibbles( saturn.d[ 0 ] + i, 5 ) );
             }
             printf( "\n" );
         } else if ( !strcmp( "D1", argv[ 1 ] ) ) {
-            printf( "    D1:\t%.5lX ->", saturn.d[1] );
+            printf( "    D1:\t%.5lX ->", saturn.d[ 1 ] );
             for ( i = 0; i < 20; i += 5 ) {
-                printf( " %s", str_nibbles( saturn.d[1] + i, 5 ) );
+                printf( " %s", str_nibbles( saturn.d[ 1 ] + i, 5 ) );
             }
             printf( "\n" );
         } else if ( !strcmp( "P", argv[ 1 ] ) ) {
@@ -3812,17 +3812,17 @@ static void cmd_regs( int argc, char** argv )
                 set_reg( val, 16, saturn.reg[ D ] );
                 dump_reg( "     D", 16, saturn.reg[ D ] );
             } else if ( !strcmp( "D0", argv[ 1 ] ) ) {
-                saturn.d[0] = ( Address )( val & 0xfffff );
-                printf( "    D0:\t%.5lX ->", saturn.d[0] );
+                saturn.d[ 0 ] = ( Address )( val & 0xfffff );
+                printf( "    D0:\t%.5lX ->", saturn.d[ 0 ] );
                 for ( i = 0; i < 20; i += 5 ) {
-                    printf( " %s", str_nibbles( saturn.d[0] + i, 5 ) );
+                    printf( " %s", str_nibbles( saturn.d[ 0 ] + i, 5 ) );
                 }
                 printf( "\n" );
             } else if ( !strcmp( "D1", argv[ 1 ] ) ) {
-                saturn.d[1] = ( Address )( val & 0xfffff );
-                printf( "    D1:\t%.5lX ->", saturn.d[1] );
+                saturn.d[ 1 ] = ( Address )( val & 0xfffff );
+                printf( "    D1:\t%.5lX ->", saturn.d[ 1 ] );
                 for ( i = 0; i < 20; i += 5 ) {
-                    printf( " %s", str_nibbles( saturn.d[1] + i, 5 ) );
+                    printf( " %s", str_nibbles( saturn.d[ 1 ] + i, 5 ) );
                 }
                 printf( "\n" );
             } else if ( !strcmp( "P", argv[ 1 ] ) ) {

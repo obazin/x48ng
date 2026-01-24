@@ -7,14 +7,15 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#include "../ui4x/src/api.h"
+
+#include "../options.h"
+
 #include "emulate.h"
 #include "init.h"
 #include "memory.h"
-#include "../options.h"
 #include "persistence.h"
 #include "serial.h"
-
-#include "../ui4x/src/api.h"
 
 // bool please_exit = false;
 bool save_before_exit = true;
@@ -107,7 +108,7 @@ void start_emulator( void )
         /*     fprintf( stderr, "initialization of %s\n", normalized_config_path ); */
 
         init_saturn();
-        if ( !read_rom( ui4x_make_filename_absolute( (char*)"rom" ) ) )
+        if ( !read_rom( ui4x_make_filename_absolute( ( char* )"rom" ) ) )
             exit( 1 ); /* can't read ROM */
     }
 

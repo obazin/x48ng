@@ -4,9 +4,10 @@
 
 #include <sys/stat.h>
 
+#include "../romio.h"
+
 #include "emulate.h"
 #include "init.h"
-#include "romio.h"
 #include "types.h"
 
 #define NB_CONFIG 8
@@ -635,20 +636,20 @@ int read_files( void )
     /* 1. read ROM from ~/.x48ng/rom into saturn.rom */
     /*************************************************/
     saturn.rom = ( Nibble* )NULL;
-    if ( !read_rom_file( ui4x_make_filename_absolute( (char*)"rom" ), &saturn.rom, &rom_size ) )
+    if ( !read_rom_file( ui4x_make_filename_absolute( ( char* )"rom" ), &saturn.rom, &rom_size ) )
         return 0;
 
     if ( ui4x_config.verbose )
-        printf( "read %s\n", ui4x_make_filename_absolute( (char*)"rom" ) );
+        printf( "read %s\n", ui4x_make_filename_absolute( ( char* )"rom" ) );
 
     rom_is_new = false;
 
     /**************************************************/
     /* 2. read saved state from ~/.x48ng/state into fp */
     /**************************************************/
-    if ( NULL == ( fp = fopen( ui4x_make_filename_absolute( (char*)"state" ), "r" ) ) ) {
+    if ( NULL == ( fp = fopen( ui4x_make_filename_absolute( ( char* )"state" ), "r" ) ) ) {
         if ( ui4x_config.verbose )
-            fprintf( stderr, "can\'t open %s\n", ui4x_make_filename_absolute( (char*)"state" ) );
+            fprintf( stderr, "can\'t open %s\n", ui4x_make_filename_absolute( ( char* )"state" ) );
         return 0;
     }
 
@@ -691,10 +692,10 @@ int read_files( void )
              */
             if ( !read_state_file( fp ) ) {
                 if ( ui4x_config.verbose )
-                    fprintf( stderr, "can't handle %s\n", ui4x_make_filename_absolute( (char*)"state" ) );
+                    fprintf( stderr, "can't handle %s\n", ui4x_make_filename_absolute( ( char* )"state" ) );
                 init_saturn();
             } else if ( ui4x_config.verbose )
-                printf( "read %s\n", ui4x_make_filename_absolute( (char*)"state" ) );
+                printf( "read %s\n", ui4x_make_filename_absolute( ( char* )"state" ) );
         }
     }
     fclose( fp );
@@ -715,12 +716,12 @@ int read_files( void )
     /*************************************************/
     /* 3. read RAM from ~/.x48ng/ram into saturn.ram */
     /*************************************************/
-    if ( ( fp = fopen( ui4x_make_filename_absolute( (char*)"ram" ), "r" ) ) == NULL ) {
+    if ( ( fp = fopen( ui4x_make_filename_absolute( ( char* )"ram" ), "r" ) ) == NULL ) {
         if ( ui4x_config.verbose )
-            fprintf( stderr, "can\'t open %s\n", ui4x_make_filename_absolute( (char*)"ram" ) );
+            fprintf( stderr, "can\'t open %s\n", ui4x_make_filename_absolute( ( char* )"ram" ) );
         return 0;
     }
-    if ( !read_mem_file( ui4x_make_filename_absolute( (char*)"ram" ), saturn.ram, ram_size ) )
+    if ( !read_mem_file( ui4x_make_filename_absolute( ( char* )"ram" ), saturn.ram, ram_size ) )
         return 0;
 
     /**************************************/
@@ -736,13 +737,13 @@ int read_files( void )
     port1_is_ram = 0;
     saturn.port1 = ( unsigned char* )0;
 
-    if ( stat( ui4x_make_filename_absolute( (char*)"port1" ), &st ) >= 0 ) {
+    if ( stat( ui4x_make_filename_absolute( ( char* )"port1" ), &st ) >= 0 ) {
         port1_size = 2 * st.st_size;
         if ( ( port1_size == 0x10000 ) || ( port1_size == 0x40000 ) ) {
             if ( NULL == ( saturn.port1 = ( Nibble* )malloc( port1_size ) ) ) {
                 if ( ui4x_config.verbose )
                     fprintf( stderr, "can\'t malloc PORT1[%ld]\n", port1_size );
-            } else if ( !read_mem_file( ui4x_make_filename_absolute( (char*)"port1" ), saturn.port1, port1_size ) ) {
+            } else if ( !read_mem_file( ui4x_make_filename_absolute( ( char* )"port1" ), saturn.port1, port1_size ) ) {
                 port1_size = 0;
                 port1_is_ram = false;
             } else {
@@ -768,14 +769,14 @@ int read_files( void )
     port2_is_ram = false;
     saturn.port2 = ( unsigned char* )0;
 
-    if ( stat( ui4x_make_filename_absolute( (char*)"port2" ), &st ) >= 0 ) {
+    if ( stat( ui4x_make_filename_absolute( ( char* )"port2" ), &st ) >= 0 ) {
         port2_size = 2 * st.st_size;
         if ( ( opt_gx && ( ( port2_size % 0x40000 ) == 0 ) ) ||
              ( !opt_gx && ( ( port2_size == 0x10000 ) || ( port2_size == 0x40000 ) ) ) ) {
             if ( NULL == ( saturn.port2 = ( Nibble* )malloc( port2_size ) ) ) {
                 if ( ui4x_config.verbose )
                     fprintf( stderr, "can\'t malloc PORT2[%ld]\n", port2_size );
-            } else if ( !read_mem_file( ui4x_make_filename_absolute( (char*)"port2" ), saturn.port2, port2_size ) ) {
+            } else if ( !read_mem_file( ui4x_make_filename_absolute( ( char* )"port2" ), saturn.port2, port2_size ) ) {
                 port2_size = 0;
                 port2_is_ram = false;
             } else {
@@ -801,7 +802,7 @@ int read_files( void )
 
 int write_files( void )
 {
-    struct stat st;
+    /* struct stat st; */
     bool make_dir = false;
     int ram_size = opt_gx ? RAM_SIZE_GX : RAM_SIZE_SX;
 
@@ -829,7 +830,7 @@ int write_files( void )
     /*     } */
     /* } */
 
-    if ( !write_state_file( ui4x_make_filename_absolute( (char*)"state" ) ) )
+    if ( !write_state_file( ui4x_make_filename_absolute( ( char* )"state" ) ) )
         return 0;
 
     rom_is_new = make_dir;
@@ -839,23 +840,23 @@ int write_files( void )
         /* strcpy( new_rom_path, normalized_config_path ); */
         /* strcat( new_rom_path, "rom" ); */
 
-        if ( !write_mem_file( ui4x_make_filename_absolute( (char*)"state" ), saturn.rom, rom_size ) )
+        if ( !write_mem_file( ui4x_make_filename_absolute( ( char* )"state" ), saturn.rom, rom_size ) )
             return 0;
 
         /* if ( ui4x_config.verbose ) */
         /*     printf( "wrote %s\n", new_rom_path ); */
     }
 
-    if ( !write_mem_file( ui4x_make_filename_absolute( (char*)"ram" ), saturn.ram, ram_size ) )
+    if ( !write_mem_file( ui4x_make_filename_absolute( ( char* )"ram" ), saturn.ram, ram_size ) )
         return 0;
 
     if ( ( port1_size > 0 ) && port1_is_ram ) {
-        if ( !write_mem_file( ui4x_make_filename_absolute( (char*)"port1" ), saturn.port1, port1_size ) )
+        if ( !write_mem_file( ui4x_make_filename_absolute( ( char* )"port1" ), saturn.port1, port1_size ) )
             return 0;
     }
 
     if ( ( port2_size > 0 ) && port2_is_ram ) {
-        if ( !write_mem_file( ui4x_make_filename_absolute( (char*)"port2" ), saturn.port2, port2_size ) )
+        if ( !write_mem_file( ui4x_make_filename_absolute( ( char* )"port2" ), saturn.port2, port2_size ) )
             return 0;
     }
 

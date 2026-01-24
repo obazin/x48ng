@@ -37,7 +37,7 @@ extern void ( *bus_write_nibble )( Address addr, Nibble val );
 extern int ( *read_nibble_crc )( Address addr );
 extern void dev_memory_init( void ); /*  */
 
-extern Nibble ( *bus_fetch_nibble )( Address addr );       /* used in debugger.c; ui_*.c */
-extern long read_nibbles( Address addr, int len ); /* used in debugger.c */
+extern Nibble ( *bus_fetch_nibble )( Address addr ); /* used in debugger.c; ui_*.c */
+extern long read_nibbles( Address addr, int len );   /* used in debugger.c */
 
 #endif /* !_MEMORY_H */

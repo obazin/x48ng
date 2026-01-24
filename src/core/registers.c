@@ -1,6 +1,6 @@
+#include "registers.h"
 #include "emulate.h"
 #include "memory.h"
-#include "registers.h"
 
 #define NB_FIELDS 19
 static int start_fields[ NB_FIELDS ] = { -1, 0, 2, 0, 15, 3, 0, 0, -1, 0, 2, 0, 15, 3, 0, 0, 0, 0, 0 };

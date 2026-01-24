@@ -9,7 +9,7 @@ extern bool port2_is_ram;
 extern long port2_mask;
 
 extern int read_rom( const char* fname );
-extern int read_files( void );      /* used in debugger.c */
-extern int write_files( void );     /* used in debugger.c */
+extern int read_files( void );  /* used in debugger.c */
+extern int write_files( void ); /* used in debugger.c */
 
 #endif /* !_PERSISTENCE_H */

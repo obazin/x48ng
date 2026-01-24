@@ -148,7 +148,7 @@ extern void do_interupt( void );
 extern void do_kbd_int( void );
 
 extern void load_addr( Address* dat, Address addr, int n ); /* used in debugger.c */
-extern void step_instruction( void );                    /* used in debugger.c */
-extern void schedule( void );                            /* used in debugger.c */
+extern void step_instruction( void );                       /* used in debugger.c */
+extern void schedule( void );                               /* used in debugger.c */
 
 #endif /* !_EMULATE_H */

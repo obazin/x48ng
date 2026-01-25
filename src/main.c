@@ -87,6 +87,8 @@ int main( int argc, char** argv )
 
     ui4x_config.model = opt_gx ? MODEL_48GX : MODEL_48SX;
 
+    ui4x_start();
+
     /*****************************************/
     /* handlers for SIGALRM, SIGPIPE */
     /*****************************************/

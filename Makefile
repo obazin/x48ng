@@ -154,7 +154,7 @@ libui4x:
 		VERSION_MAJOR=$(VERSION_MAJOR) \
 		VERSION_MINOR=$(VERSION_MINOR) \
 		PATCHLEVEL=$(PATCHLEVEL) \
-		DATADIR=$(DATADIR)
+		DATADIR="$(DATADIR)"
 
 clean-libui4x:
 	$(MAKE) -C $(UI4X_DIR) clean
@@ -203,7 +203,7 @@ pretty-code:
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 $(TARGET): $(OBJS) libui4x
-	$(CC) $(LDFLAGS) -o dist/$(TARGET) $(OBJS) $(LDLIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o dist/$(TARGET) $(OBJS) $(LDLIBS)
 
 dist/x48ng-dump2rom: src/legacy_tools/dump2rom.o
 dist/x48ng-checkrom: src/legacy_tools/checkrom.o src/romio.o

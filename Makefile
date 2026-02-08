@@ -12,12 +12,12 @@ VERSION_MAJOR = 1
 VERSION_MINOR = 1
 PATCHLEVEL = 99
 
-PREFIX = /usr
-BINDIR = $(PREFIX)/bin
-DATADIR = $(PREFIX)/share/$(TARGET)
-DOCDIR = $(PREFIX)/doc/$(TARGET)
-MENUDIR = $(PREFIX)/share/applications
-MANDIR = $(PREFIX)/share/man/man1
+PREFIX ?= /usr
+BINDIR ?= $(PREFIX)/bin
+DATADIR ?= $(PREFIX)/share/$(TARGET)
+DOCDIR ?= $(PREFIX)/doc/$(TARGET)
+MENUDIR ?= $(PREFIX)/share/applications
+MANDIR ?= $(PREFIX)/share/man/man1
 
 PKG_CONFIG ?= pkg-config
 
@@ -65,7 +65,7 @@ ifeq ($(DEBUG), yes)
 		-g \
 		-pg
 
-	LDFLAGS += -g -pg
+	DEBUG_LDFLAGS = -g -pg
 endif
 
 # ifeq ($(FULL_WARNINGS), no)
@@ -83,6 +83,7 @@ endif
 # endif
 
 override CFLAGS := \
+	$(CFLAGS) \
 	-std=gnu2x \
 	-O$(OPTIM) \
 	-W \
@@ -116,8 +117,12 @@ override CFLAGS := \
 	-DVERSION_MAJOR=$(VERSION_MAJOR) \
 	-DVERSION_MINOR=$(VERSION_MINOR) \
 	-DPATCHLEVEL=$(PATCHLEVEL) \
-	-DDATADIR=\"$(DATADIR)\" \
-	$(CFLAGS)
+	-DDATADIR=\"$(DATADIR)\"
+
+override LDFLAGS := \
+	$(LDFLAGS) \
+	$(DEBUG_LDFLAGS) \
+	-Wl,--no-as-needed
 
 SRCS = src/options.c \
 	src/romio.c \
@@ -141,6 +146,7 @@ do-it-all: $(TARGET) dot-desktop manfile
 else
 do-it-all: depend-and-build
 endif
+
 
 # src/ui4x/libui4x ############################
 UI4X_DIR = src/ui4x
@@ -172,6 +178,7 @@ override LDLIBS := $(LDLIBS) \
 	$(SDL_LDLIBS) \
 	$(UI4X_LDLIBS)
 
+
 ##########
 # Depend #
 ##########
@@ -188,12 +195,12 @@ depend-and-build: depend
 compile_commands.json: distclean
 	bear -- make
 
+
 ####################
 # auto-format code #
 ####################
 pretty-code:
 	clang-format -i src/*.c src/*.h src/core/*.c src/core/*.h
-
 
 
 ###############
@@ -207,6 +214,7 @@ $(TARGET): $(OBJS) libui4x
 
 dist/x48ng-dump2rom: src/legacy_tools/dump2rom.o
 dist/x48ng-checkrom: src/legacy_tools/checkrom.o src/romio.o
+
 
 ##################
 # Populate dist/ #
@@ -227,6 +235,7 @@ get-roms: pull-firmware
 
 distclean-firmware:
 	make -C dist/ROMs mrproper
+
 
 ############
 # Cleaning #

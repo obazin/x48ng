@@ -125,13 +125,11 @@ config_t* config_init( int argc, char* argv[] )
         }
     }
 
-    if ( clopt_print_config_and_exit ) {
-        fprintf( stdout, "Calculated configuration:\n%s", config_to_string() );
-        exit( EXIT_SUCCESS );
-    }
+    if ( clopt_print_config_and_exit || ui4x_config.verbose )
+        fprintf( stdout, "%s", config_to_string() );
 
-    if ( ui4x_config.verbose )
-        fprintf( stdout, "Calculated configuration:\n%s", config_to_string() );
+    if ( clopt_print_config_and_exit )
+        exit( EXIT_SUCCESS );
 
     return &__config;
 }

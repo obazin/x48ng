@@ -86,6 +86,8 @@ int main( int argc, char** argv )
     init_emulator();
 
     ui4x_config.model = opt_gx ? MODEL_48GX : MODEL_48SX;
+    if ( ui4x_config.style_filename == NULL )
+        ui4x_config.style_filename = opt_gx ? "style-48gx.css" : "style-48sx.css";
 
     ui4x_start();
 

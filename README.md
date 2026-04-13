@@ -108,6 +108,9 @@ for SDL version:
 
 ## Installation
 
+First clone the source code, ensuring you get all submodules:
+`git clone --recursive https://codeberg.org/gwh/x48ng.git`
+
 0. Run `make get-roms` unless you have a good reason not to. (ROMs licenses are unclear so they're not bundled by default.)
 1. Run `sudo make install PREFIX=/usr` (see the Makefile to see what variables your can override.)
 2. Run `x48ng-launcher`. On first launch or if no ~/.config/x48ng/ exists it will be created and populated.

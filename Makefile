@@ -220,10 +220,10 @@ dist/x48ng-checkrom: src/legacy_tools/checkrom.o src/romio.o
 # Populate dist/ #
 ##################
 dot-desktop: src/$(TARGET).desktop.in
-	perl -p -e "s!@PREFIX@!$(TARGET)!" < $^ > dist/$(TARGET).desktop
+	sed 's|@PREFIX@|$(PREFIX)|g' $< > dist/$(TARGET).desktop
 
 manfile: src/$(TARGET).man.1.in
-	perl -p -e "s!@PREFIX@!$(TARGET)!" < $^ > dist/$(TARGET).man.1
+	cp $< dist/$(TARGET).man.1
 
 
 ###########################################
@@ -246,7 +246,7 @@ clean: clean-libui4x
 
 mrproper: clean distclean-libui4x
 	rm -f compile_commands.json
-	rm -f dist/$(TARGET) dist/$(TARGET).desktop dist/$(TARGET).man
+	rm -f dist/$(TARGET) dist/$(TARGET).desktop dist/$(TARGET).man.1
 	find . -name \*.o -exec  rm {} \;
 
 distclean: mrproper distclean-firmware

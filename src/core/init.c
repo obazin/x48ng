@@ -108,7 +108,7 @@ void start_emulator( void )
         /*     fprintf( stderr, "initialization of %s\n", normalized_config_path ); */
 
         init_saturn();
-        if ( !read_rom( ui4x_make_filename_absolute( ( char* )"rom" ) ) )
+        if ( !read_rom( ui4x_make_filename_absolute_for_loading( ( char* )"rom" ) ) )
             exit( 1 ); /* can't read ROM */
     }
 

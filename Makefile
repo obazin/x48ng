@@ -265,7 +265,7 @@ install: all
 	install -D -m 644 dist/$(TARGET).man.1 "$(DESTDIR)$(MANDIR)/$(TARGET).1"
 	mkdir -p "$(DESTDIR)$(DATADIR)/"
 	cp -r dist/ROMs/ "$(DESTDIR)$(DATADIR)/ROMs"
-	cp -r src/ui4x/themes/ "$(DESTDIR)$(DATADIR)/"
+	cp -r src/ui4x/themes/ src/ui4x/*.css "$(DESTDIR)$(DATADIR)/"
 	mkdir -p "$(DESTDIR)$(DOCDIR)/"
 	cp -r ./doc* ./romdump/ ./README.* ./LICENSE ./AUTHORS ./*.png "$(DESTDIR)$(DOCDIR)/"
 

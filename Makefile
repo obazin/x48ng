@@ -264,10 +264,10 @@ install: all
 	mkdir -p "$(DESTDIR)$(MANDIR)/"
 	install -D -m 644 dist/$(TARGET).man.1 "$(DESTDIR)$(MANDIR)/$(TARGET).1"
 	mkdir -p "$(DESTDIR)$(DATADIR)/"
-	cp -R dist/ROMs/ "$(DESTDIR)$(DATADIR)/ROMs"
-	cp src/ui4x/*.css "$(DESTDIR)$(DATADIR)/"
+	cp -r dist/ROMs/ "$(DESTDIR)$(DATADIR)/ROMs"
+	cp -r src/ui4x/themes/ "$(DESTDIR)$(DATADIR)/"
 	mkdir -p "$(DESTDIR)$(DOCDIR)/"
-	cp -R ./doc* ./romdump/ ./README.* ./LICENSE ./AUTHORS ./*.png "$(DESTDIR)$(DOCDIR)/"
+	cp -r ./doc* ./romdump/ ./README.* ./LICENSE ./AUTHORS ./*.png "$(DESTDIR)$(DOCDIR)/"
 
 uninstall:
 	rm -f "$(DESTDIR)$(BINDIR)/$(TARGET)"

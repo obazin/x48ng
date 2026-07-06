@@ -46,8 +46,8 @@ GTK_LDLIBS = $(shell "$(PKG_CONFIG)" --libs gtk4)
 LUA_CFLAGS = $(shell "$(PKG_CONFIG)" --cflags $(LUA_VERSION))
 LUA_LDLIBS = $(shell "$(PKG_CONFIG)" --libs $(LUA_VERSION))
 
-NCURSES_CFLAGS = $(shell "$(PKG_CONFIG)" --cflags ncursesw readline) -DNCURSES_WIDECHAR=1 -DHAS_NCURSES=1
-NCURSES_LDLIBS = $(shell "$(PKG_CONFIG)" --libs ncursesw readline)
+NCURSES_CFLAGS = $(shell "$(PKG_CONFIG)" --cflags ncursesw readline tinfo) -DNCURSES_WIDECHAR=1 -DHAS_NCURSES=1
+NCURSES_LDLIBS = $(shell "$(PKG_CONFIG)" --libs ncursesw readline tinfo)
 
 ### SDL UI
 ifeq ($(WITH_SDL), yes)

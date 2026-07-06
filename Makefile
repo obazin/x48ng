@@ -15,7 +15,7 @@ PATCHLEVEL = 0
 PREFIX ?= /usr
 BINDIR ?= $(PREFIX)/bin
 DATADIR ?= $(PREFIX)/share/$(TARGET)
-DOCDIR ?= $(PREFIX)/doc/$(TARGET)
+DOCDIR ?= $(PREFIX)/share/doc/$(TARGET)
 MENUDIR ?= $(PREFIX)/share/applications
 MANDIR ?= $(PREFIX)/share/man/man1
 

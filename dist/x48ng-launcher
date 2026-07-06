@@ -8,12 +8,17 @@ BINNAME=${BINNAME:-./x48ng}
 CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
 CONFIGDIR=${CONFIGDIR:-$CONFIG_HOME/$BINNAME}
 
-# possible values: "gxrom-l" "gxrom-m" "gxrom-p" "gxrom-r" "sxrom-a" "sxrom-b"s"xrom-c" "sxrom-d" "sxrom-e" "sxrom-j"
-ROM=${ROM:-"gxrom-r"}
-
 mkdir -p "$CONFIGDIR"
+
 if [ ! -e "$CONFIGDIR"/rom ]; then
     # there's no rom file, let's find one
+
+    # possible values: "gxrom-l" "gxrom-m" "gxrom-p" "gxrom-r" "sxrom-a" "sxrom-b" "sxrom-c" "sxrom-d" "sxrom-e" "sxrom-j"
+    DEFAULT_ROM="gxrom-r"
+    # If
+    [ -e "$CONFIGDIR"/config.lua ] && grep -q "^model\s*=\s*\"48sx\"" "$CONFIGDIR"/config.lua && DEFAULT_ROM="sxrom-j"
+
+    ROM=${ROM:-$DEFAULT_ROM}
 
     if [ -d ../share/"$BINNAME"/ROMs/ ]; then
         # If we're installed then copy /usr/share/x48ng/ROMs/ in ~/.config/x48g/

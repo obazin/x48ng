@@ -3,6 +3,7 @@
 #include <locale.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include <sys/time.h>
@@ -86,8 +87,18 @@ int main( int argc, char** argv )
     init_emulator();
 
     ui4x_config.model = opt_gx ? MODEL_48GX : MODEL_48SX;
+
+    if ( ui4x_config.name == NULL )
+        ui4x_config.name = strdup( progname );
+
     if ( ui4x_config.style_filename == NULL )
         ui4x_config.style_filename = opt_gx ? "themes/48gx/style.css" : "themes/48sx/style.css";
+
+    if ( x48ng_config.print_config_and_exit || ui4x_config.verbose )
+        fprintf( stdout, "%s", config_to_string() );
+
+    if ( x48ng_config.print_config_and_exit )
+        exit( EXIT_SUCCESS );
 
     ui4x_start();
 

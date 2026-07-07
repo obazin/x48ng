@@ -23,6 +23,8 @@ typedef struct config_t {
     bool reset;
     bool inhibit_shutdown;
 
+    bool print_config_and_exit;
+
     char* ir_serial_device;
 } config_t;
 extern config_t x48ng_config;
@@ -30,6 +32,7 @@ extern config_t x48ng_config;
 /*************/
 /* functions */
 /*************/
+extern char* config_to_string( void );
 extern config_t* config_init( int argc, char* argv[] );
 
 #endif /* !_OPTIONS_H */

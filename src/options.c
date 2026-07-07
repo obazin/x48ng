@@ -17,6 +17,8 @@ static config_t __config = {
     .throttle = false,
     .reset = false,
 
+    .print_config_and_exit = false,
+
     .ir_serial_device = NULL,
 };
 
@@ -43,7 +45,7 @@ static void show_help( void )
              ui4x_config.progname, VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL, ui4x_config.progname, ui4x_get_help_string() );
 }
 
-static char* config_to_string( void )
+char* config_to_string( void )
 {
     char* config;
     if ( -1 == asprintf( &config,
@@ -125,11 +127,7 @@ config_t* config_init( int argc, char* argv[] )
         }
     }
 
-    if ( clopt_print_config_and_exit || ui4x_config.verbose )
-        fprintf( stdout, "%s", config_to_string() );
-
-    if ( clopt_print_config_and_exit )
-        exit( EXIT_SUCCESS );
+    __config.print_config_and_exit = clopt_print_config_and_exit;
 
     return &__config;
 }

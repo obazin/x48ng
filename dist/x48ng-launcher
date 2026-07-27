@@ -40,7 +40,7 @@ if [ ! -e "$CONFIGDIR"/rom ]; then
         echo "You can hit Ctrl-C now if you do not wish to download them."
         read -r
 
-        make -C "$CONFIGDIR"/ROMs "$ROM"
+        gmake -C "$CONFIGDIR"/ROMs "$ROM"
     fi
 
     # Finally install the ROM for x48ng

@@ -153,7 +153,7 @@ UI4X_DIR = src/ui4x
 UI4X_LDLIBS = -L$(UI4X_DIR) -lui4x
 
 libui4x:
-	make -C $(UI4X_DIR) libui4x.a \
+	$(MAKE) -C $(UI4X_DIR) libui4x.a \
 		WITH_SDL=$(WITH_SDL) \
 		WITH_SDL2=$(WITH_SDL2) \
 		LUA_VERSION=$(LUA_VERSION) \
@@ -230,11 +230,11 @@ manfile: src/$(TARGET).man.1.in
 # Populate dist/firmware/ from hpcalc.org #
 ###########################################
 pull-firmware:
-	make -C dist/ROMs
+	$(MAKE) -C dist/ROMs
 get-roms: pull-firmware
 
 distclean-firmware:
-	make -C dist/ROMs mrproper
+	$(MAKE) -C dist/ROMs mrproper
 
 
 ############

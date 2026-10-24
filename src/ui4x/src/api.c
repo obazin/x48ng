@@ -602,7 +602,9 @@ const char* ui4x_get_help_string( void )
            "   --49g          emulate a HP 49G\n"
            "   --50g          emulate a HP 50G\n"
            "   --gtk                     use gtk GUI (Graphical UI) (default: true)\n"
+#ifdef HAS_SDL
            "   --sdl                     use sdl GUI (Graphical UI) (default: false)\n"
+#endif
            "   --tui                     use ncurses TUI (Terminal text UI) (default: false)\n"
            "   --tui-small               use ncurses TUI (4 pixels per character) (Terminal text UI) (default: false)\n"
            "   --tui-tiny                use ncurses TUI (8 pixels per character) (Terminal text UI) (default: false)\n"

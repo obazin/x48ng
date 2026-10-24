@@ -53,9 +53,7 @@ NCURSES_SRC = src/ncurses.c
 ifeq ($(WITH_SDL), yes)
 	SDL_CFLAGS = $(call pkg-cflags,sdl3) -DHAS_SDL=1
 	SDL_LDLIBS = $(shell "$(PKG_CONFIG)" --libs sdl3)
-	SDL_SRC = src/sdl.c \
-		src/sdl_bitmaps.c \
-		src/sdl_fonts.c
+	SDL_SRC = src/sdl.c
 endif
 
 ifeq ($(WITH_SDL2), yes)
@@ -109,9 +107,12 @@ LIBS = -lm \
 	$(LUA_LDLIBS)
 
 
+# the key label bitmaps and fonts are plain data used by every model's layout, whatever the front-ends built
 LIBUI4X_SRCS = $(NCURSES_SRC) \
 	$(GTK_SRC) \
 	$(SDL_SRC) \
+	src/sdl_bitmaps.c \
+	src/sdl_fonts.c \
 	src/48gx.c \
 	src/48sx.c \
 	src/49g.c \

@@ -47,12 +47,6 @@ int main( int argc, char** argv )
 {
     setlocale( LC_ALL, "C" );
 
-#if defined( __APPLE__ ) && defined( HAS_SDL )
-    /* SDL's default Metal renderer blocks in -[CAMetalLayer nextDrawable] on every present, starving the
-       emulation loop (badly so when the window is hidden); OpenGL doesn't. An explicit choice still wins. */
-    setenv( "SDL_RENDER_DRIVER", "opengl", 0 );
-#endif
-
     char* progname = g_path_get_basename( argv[ 0 ] );
     char* progpath = g_path_get_dirname( argv[ 0 ] );
     char* default_datadir = g_build_filename( g_get_user_config_dir(), progname, NULL );

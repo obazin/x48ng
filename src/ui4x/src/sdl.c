@@ -50,12 +50,16 @@
 
 #  define SDL_SetTextureScaleMode( t, m )
 #  define SDL_Init !SDL_Init
+/* SDL2 has no occlusion tracking, and already maps mouse events through the logical size */
+#  define SDL_WINDOW_OCCLUDED 0
+#  define SDL_ConvertEventToRenderCoordinates( r, e )
 
 #  define CREATE_SURFACE( w, h, a, b, c, d, e ) SDL_CreateRGBSurface( SDL_SWSURFACE, w, h, a, b, c, d, e )
 #  define EVENT_KEY( e ) e.key.keysym.sym
 #  define CREATE_WINDOW( n, w, h, flags ) SDL_CreateWindow( n, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, flags )
 #  define CREATE_RENDERER( w ) SDL_CreateRenderer( w, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE )
 #  define SET_RENDER_LOGICAL_PRESENTATION( r, w, h ) SDL_RenderSetLogicalSize( r, w, h )
+#  define IS_WINDOW_EVENT( e ) ( ( e ).type == SDL_WINDOWEVENT )
 #else
 #  include <SDL3/SDL.h>
 
@@ -64,6 +68,7 @@
 #  define CREATE_WINDOW( n, w, h, flags ) SDL_CreateWindow( n, w, h, flags )
 #  define CREATE_RENDERER( w ) SDL_CreateRenderer( w, NULL )
 #  define SET_RENDER_LOGICAL_PRESENTATION( r, w, h ) SDL_SetRenderLogicalPresentation( r, w, h, SDL_LOGICAL_PRESENTATION_LETTERBOX )
+#  define IS_WINDOW_EVENT( e ) ( ( e ).type >= SDL_EVENT_WINDOW_FIRST && ( e ).type <= SDL_EVENT_WINDOW_LAST )
 #endif
 
 #include "api.h"
@@ -128,6 +133,11 @@ static SDL_Window* window;
 static SDL_Renderer* renderer;
 static SDL_Texture* main_texture;
 static SDL_Texture* display_texture;
+
+static bool needs_present = true;     /* main_texture changed since it was last shown */
+static bool presenting_stalls = false; /* the last present stalled: the window is most likely hidden */
+static int last_lcd_buffer[ LCD_WIDTH * 80 ];
+static int last_lcd_contrast = -1;
 
 /****************************/
 /* functions implementation */
@@ -286,11 +296,6 @@ static void create_annunciators_textures( void )
 // Returns -1 is no key is pressed
 static int mouse_click_to_hpkey( int x, int y )
 {
-#ifndef HAS_SDL2
-    x /= ui4x_config.zoom;
-    y /= ui4x_config.zoom;
-#endif
-
     /* return immediatly if the click isn't even in the keyboard area */
     if ( y < OFFSET_Y_KEYBOARD )
         return -1;
@@ -918,6 +923,31 @@ static void _draw_background( int width, int height, int w_top, int h_top )
 
 static void _draw_background_LCD( void ) { __draw_rect( OFFSET_X_DISPLAY, OFFSET_Y_DISPLAY, WIDTH_DISPLAY, HEIGHT_DISPLAY, COLOR_LCD_BG ); }
 
+// Copy main_texture to the window.
+// Presenting waits for the compositor to hand out a new drawable, which on macOS can take up to a second per call
+// while the window is hidden, so only do it once per refresh, when something changed and the window can be seen.
+static void present( void )
+{
+    if ( !needs_present || presenting_stalls ||
+         ( SDL_GetWindowFlags( window ) & ( SDL_WINDOW_HIDDEN | SDL_WINDOW_MINIMIZED | SDL_WINDOW_OCCLUDED ) ) )
+        return;
+
+    Uint64 start = SDL_GetTicks();
+
+    SDL_SetRenderTarget( renderer, NULL );
+    SDL_SetRenderDrawColor( renderer, 0, 0, 0, 0xff );
+    SDL_RenderClear( renderer );
+    SDL_RenderTexture( renderer, main_texture, NULL, NULL );
+    SDL_RenderPresent( renderer );
+
+    needs_present = false;
+
+    // A present taking far longer than a frame means nothing is displaying the window, hidden in a way SDL did not
+    // report (e.g. opened behind another window): hold off until the next window event.
+    if ( SDL_GetTicks() - start > 100 )
+        presenting_stalls = true;
+}
+
 // Show the hp key which is being pressed
 static void _show_key( int hpkey )
 {
@@ -928,11 +958,7 @@ static void _show_key( int hpkey )
 
     _draw_key( hpkey );
 
-    SDL_SetRenderTarget( renderer, NULL );
-    SDL_RenderTexture( renderer, main_texture, NULL, NULL );
-    SDL_RenderPresent( renderer );
-
-    return;
+    needs_present = true;
 }
 
 static void _draw_serial_devices_path( void )
@@ -996,10 +1022,7 @@ static void sdl_update_annunciators( void )
                         annunciators_ui[ i ].height,
                         ( ( annunciators >> i ) & 0x01 ) ? annunciators_textures[ i ].up : annunciators_textures[ i ].down );
 
-    // Always immediately update annunciators
-    SDL_SetRenderTarget( renderer, NULL );
-    SDL_RenderTexture( renderer, main_texture, NULL, NULL );
-    SDL_RenderPresent( renderer );
+    needs_present = true;
 }
 
 static int apply_contrast( int value, int contrast )
@@ -1087,6 +1110,15 @@ void sdl_ui4x_handle_pending_inputs( void )
 
     // Iterate as long as there are events
     while ( SDL_PollEvent( &event ) ) {
+        // map window coordinates to the faceplate, whatever the window size or zoom
+        SDL_ConvertEventToRenderCoordinates( renderer, &event );
+
+        // exposed, resized, restored, … : show the faceplate again
+        if ( IS_WINDOW_EVENT( event ) ) {
+            needs_present = true;
+            presenting_stalls = false;
+        }
+
         switch ( event.type ) {
             case SDL_EVENT_QUIT:
                 // please_exit = true;
@@ -1134,31 +1166,33 @@ void sdl_ui_refresh_lcd( void )
     if ( ui4x_emulator_api.is_display_on() )
         ui4x_emulator_api.get_lcd_buffer( display_buffer_grayscale );
 
-    SDL_SetRenderTarget( renderer, display_texture );
+    // only redraw the LCD when its content or contrast changed
+    if ( last_lcd_contrast != last_contrast || memcmp( display_buffer_grayscale, last_lcd_buffer, sizeof( last_lcd_buffer ) ) != 0 ) {
+        memcpy( last_lcd_buffer, display_buffer_grayscale, sizeof( last_lcd_buffer ) );
+        last_lcd_contrast = last_contrast;
 
-    int pxl_val;
-    for ( int y = 0; y < LCD_HEIGHT; ++y ) {
-        for ( int x = 0; x < LCD_WIDTH; ++x ) {
-            pxl_val = display_buffer_grayscale[ ( y * LCD_WIDTH ) + x ];
+        SDL_SetRenderTarget( renderer, display_texture );
 
-            __draw_pixel_rgba( x, y, pixel_colors[ pxl_val ].r, pixel_colors[ pxl_val ].g, pixel_colors[ pxl_val ].b,
-                               pixel_colors[ pxl_val ].a );
+        int pxl_val;
+        for ( int y = 0; y < LCD_HEIGHT; ++y ) {
+            for ( int x = 0; x < LCD_WIDTH; ++x ) {
+                pxl_val = display_buffer_grayscale[ ( y * LCD_WIDTH ) + x ];
+
+                __draw_pixel_rgba( x, y, pixel_colors[ pxl_val ].r, pixel_colors[ pxl_val ].g, pixel_colors[ pxl_val ].b,
+                                   pixel_colors[ pxl_val ].a );
+            }
         }
+
+        SDL_SetRenderTarget( renderer, main_texture );
+
+        __draw_texture( OFFSET_X_DISPLAY + 5, OFFSET_Y_DISPLAY + 20, LCD_WIDTH * 2, LCD_HEIGHT * 2, display_texture );
+
+        needs_present = true;
     }
 
-    SDL_SetRenderTarget( renderer, NULL );
-    SDL_SetTextureScaleMode( display_texture, SDL_SCALEMODE_NEAREST );
-    SDL_RenderTexture( renderer, display_texture, NULL, NULL );
-
-    SDL_SetRenderTarget( renderer, main_texture );
-
-    __draw_texture( OFFSET_X_DISPLAY + 5, OFFSET_Y_DISPLAY + 20, LCD_WIDTH * 2, LCD_HEIGHT * 2, display_texture );
-
-    SDL_SetRenderTarget( renderer, NULL );
-    SDL_RenderTexture( renderer, main_texture, NULL, NULL );
-    SDL_RenderPresent( renderer );
-
     sdl_update_annunciators();
+
+    present();
 }
 
 void sdl_ui4x_init( void )
@@ -1200,6 +1234,7 @@ void sdl_ui4x_init( void )
     main_texture = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height );
 
     display_texture = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, LCD_WIDTH, LCD_HEIGHT );
+    SDL_SetTextureScaleMode( display_texture, SDL_SCALEMODE_NEAREST );
 
     SDL_SetRenderTarget( renderer, main_texture );
 
@@ -1221,9 +1256,8 @@ void sdl_ui4x_init( void )
 
     _draw_background_LCD();
 
-    SDL_SetRenderTarget( renderer, NULL );
-    SDL_RenderTexture( renderer, main_texture, NULL, NULL );
-    SDL_RenderPresent( renderer );
+    needs_present = true;
+    present();
 }
 
 void sdl_exit( void )

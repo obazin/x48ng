@@ -86,35 +86,35 @@ See and report at https://codeberg.org/gwh/x48ng/issues or https://github.com/gw
 
 ## Compilation
 
-The `Makefile` will try to autodetect if necessary dependencies for x11 and sdl front-ends are met and enable/disable x11 and sdl front-ends accordingly.
+The GTK and ncurses front-ends are always built. The SDL front-end is built with SDL3 by default: use `make WITH_SDL2=yes` to build it with SDL2 instead, or `make WITH_SDL=no` to leave it out.
 
-You can force disable sdl front-end by compiling with `make WITH_SDL=no`.
-
-Ncurses front-end is always built-in.
+The UI library, [ui4x](https://codeberg.org/gwh/ui4x), is included in `src/ui4x/` (vendored from ui4x 1.1.1 and modified since), so there is no submodule to fetch.
 
 ### Dependencies (see .github/workflows/c-cpp.yml for debian packages names)
 
 - Lua
 - readline
-
-for Ncurses:
-
-- ncursesw
-
-for SDL version:
-
-- SDL3
-- SDL3_gfx
+- GLib and GTK 4 (for the GTK front-end, the default)
+- ncursesw (for the ncurses front-ends)
+- SDL3, or SDL2 with `WITH_SDL2=yes` (for the SDL front-end)
+- zlib
 
 ## Installation
-
-First clone the source code, ensuring you get all submodules:
-`git clone --recursive https://codeberg.org/gwh/x48ng.git`
 
 0. Run `make get-roms` unless you have a good reason not to. (ROMs licenses are unclear so they're not bundled by default.)
 1. Run `sudo make install PREFIX=/usr` (see the Makefile to see what variables your can override.)
 2. Run `x48ng-launcher`. On first launch or if no ~/.config/x48ng/ exists it will be created and populated.
    By default it sets up a HP 48GX with ROM `R` with a 128KB card in port 1 and a 4MB card in port 2. You can change the ROM by setting the ROM environment variable (`ROM=sxrom-j x48ng-launcher` for example.)
+
+The data directory (themes, ROMs) is compiled in from `PREFIX`; changing `PREFIX` triggers a full rebuild.
+
+### macOS
+
+The provided `shell.nix` brings every dependency, and `.envrc` loads it automatically with [direnv](https://direnv.net/) and [nix-direnv](https://github.com/nix-community/nix-direnv) (run `direnv allow` once).
+
+- Build with `nix-shell --run make`, or just `make` once direnv is set up.
+- `/usr` is read-only on macOS, so install somewhere else, for example `make install PREFIX=$HOME/.local` (with `~/.local/bin` in your `PATH`).
+- The SDL front-end (`x48ng-launcher --sdl`, or `frontend = "sdl"` in `~/.config/x48ng/config.lua`) renders with Metal. It stays responsive while its window is hidden and handles resizing.
 
 ## Development
 

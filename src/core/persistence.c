@@ -627,7 +627,6 @@ int read_files( void )
 {
     /* unsigned long v1, v2; */
     int i;
-    bool read_version;
     int ram_size;
     struct stat st;
     FILE* fp;
@@ -667,36 +666,37 @@ int read_files( void )
         exit( 99 );
     } else {
         /*
-         * MAGIC ok, read and compare the version
+         * MAGIC ok, read the version and the state.
+         *
+         * x48ng writes 3 version bytes (major, minor, patchlevel) since COMPILE_VERSION was dropped, while x48 0.6.4 and
+         * older x48ng wrote a 4th one. Reading 4 bytes from a current file shifted every field by one, failed at the end
+         * and silently reset the CPU on every start. Try the current layout first, and only accept a layout that ends
+         * exactly at the end of the file, as the other one is one byte off.
          */
-        read_version = true;
-        for ( i = 0; i < 4; i++ ) {
-            if ( !read_char( fp, &saturn.version[ i ] ) ) {
-                if ( ui4x_config.verbose )
-                    fprintf( stderr, "can\'t read version\n" );
-                read_version = false;
+        long state_start = ftell( fp );
+        bool state_read = false;
+
+        for ( int version_length = 3; version_length <= 4 && !state_read; version_length++ ) {
+            bool version_read = true;
+            char version;
+
+            fseek( fp, state_start, SEEK_SET );
+            for ( i = 0; i < version_length; i++ ) {
+                if ( !read_char( fp, &version ) )
+                    version_read = false;
+                else if ( i < ( int )sizeof( saturn.version ) )
+                    saturn.version[ i ] = version;
             }
+
+            state_read = version_read && read_state_file( fp ) && fgetc( fp ) == EOF;
         }
 
-        if ( read_version ) {
-            /* v1 = ( ( int )saturn.version[ 0 ] & 0xff ) << 24; */
-            /* v1 |= ( ( int )saturn.version[ 1 ] & 0xff ) << 16; */
-            /* v1 |= ( ( int )saturn.version[ 2 ] & 0xff ) << 8; */
-            /* v1 |= ( ( int )saturn.version[ 3 ] & 0xff ); */
-            /* v2 = ( ( int )VERSION_MAJOR & 0xff ) << 24; */
-            /* v2 |= ( ( int )VERSION_MINOR & 0xff ) << 16; */
-            /* v2 |= ( ( int )PATCHLEVEL & 0xff ) << 8; */
-
-            /*
-             * try to read latest version file
-             */
-            if ( !read_state_file( fp ) ) {
-                if ( ui4x_config.verbose )
-                    fprintf( stderr, "can't handle %s\n", ui4x_make_filename_absolute_for_loading( ( char* )"state" ) );
-                init_saturn();
-            } else if ( ui4x_config.verbose )
-                printf( "read %s\n", ui4x_make_filename_absolute_for_loading( ( char* )"state" ) );
-        }
+        if ( !state_read ) {
+            if ( ui4x_config.verbose )
+                fprintf( stderr, "can't handle %s\n", ui4x_make_filename_absolute_for_loading( ( char* )"state" ) );
+            init_saturn();
+        } else if ( ui4x_config.verbose )
+            printf( "read %s\n", ui4x_make_filename_absolute_for_loading( ( char* )"state" ) );
     }
     fclose( fp );
 

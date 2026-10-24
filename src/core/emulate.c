@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <stdio.h>
 #include <unistd.h>
 
@@ -58,13 +59,7 @@ static bool first_press = true; // PATCH
 
 static unsigned long instructions = 0;
 
-static unsigned long s_1 = 0;
-static unsigned long s_16 = 0;
-static unsigned long old_s_1 = 0;
-static unsigned long old_s_16 = 0;
-static unsigned long delta_t_1;
-static unsigned long delta_t_16;
-static unsigned long delta_i;
+static word_64 old_run_ticks = 0;
 
 static long sched_instr_rollover = SCHED_INSTR_ROLLOVER;
 static long sched_receive = SCHED_RECEIVE;
@@ -2901,23 +2896,28 @@ void schedule( void )
 
     if ( ( sched_statistics -= steps ) <= 0 ) {
         sched_statistics = SCHED_STATISTICS;
-        /* run = get_timer( RUN_TIMER ); */
-        delta_t_1 = s_1 - old_s_1;
-        delta_t_16 = s_16 - old_s_16;
-        old_s_1 = s_1;
-        old_s_16 = s_16;
-        delta_i = instructions - old_stat_instr;
-        old_stat_instr = instructions;
-        if ( delta_t_1 > 0 ) {
-            t1_i_per_tick = ( ( NB_SAMPLES - 1 ) * t1_i_per_tick + ( delta_i / delta_t_16 ) ) / NB_SAMPLES;
+
+        /* Measure how many instructions run per timer tick, so that timer2 advances at the real 8192 Hz between two
+           adjustments. Without this measurement it would tick every 16 instructions, way too fast on a modern CPU,
+           and get_t1_t2() would end up folding the excess into the time of day: the calculator clock would run fast.
+           A statistics period lasts only a few milliseconds nowadays, so count in 8192 Hz ticks rather than seconds. */
+        word_64 run_ticks = get_timer( RUN_TIMER ); /* 8192 Hz ticks spent executing, i.e. not asleep in SHUTDN */
+
+        /* after the rollover below reset RUN_TIMER and the instruction count, or within the same tick, keep the rates */
+        if ( run_ticks > old_run_ticks && instructions > old_stat_instr ) {
+            word_64 delta_ticks = run_ticks - old_run_ticks;
+            word_64 delta_instructions = instructions - old_stat_instr;
+
+            t1_i_per_tick = ( ( NB_SAMPLES - 1 ) * t1_i_per_tick + ( delta_instructions * 512 / delta_ticks ) ) / NB_SAMPLES;
             t2_i_per_tick = t1_i_per_tick / 512;
-            saturn.i_per_s = ( ( NB_SAMPLES - 1 ) * saturn.i_per_s + ( delta_i / delta_t_1 ) ) / NB_SAMPLES;
-        } else {
-            t1_i_per_tick = 8192;
-            t2_i_per_tick = 16;
+            saturn.i_per_s = ( ( NB_SAMPLES - 1 ) * saturn.i_per_s + ( delta_instructions * 8192 / delta_ticks ) ) / NB_SAMPLES;
+
+            /* the saved state keeps these as shorts: clamp rather than wrap (timer1 gets resynced to real time anyway) */
+            saturn.t1_tick = t1_i_per_tick > SHRT_MAX ? SHRT_MAX : t1_i_per_tick;
+            saturn.t2_tick = t2_i_per_tick > SHRT_MAX ? SHRT_MAX : t2_i_per_tick;
         }
-        saturn.t1_tick = t1_i_per_tick;
-        saturn.t2_tick = t2_i_per_tick;
+        old_run_ticks = run_ticks;
+        old_stat_instr = instructions;
     }
     if ( sched_statistics < schedule_event )
         schedule_event = sched_statistics;

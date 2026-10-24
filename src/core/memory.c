@@ -251,6 +251,9 @@ static void write_dev_mem( Address addr, int val )
         case 0x13f: /* TIMER2 */
             saturn.timer2 &= ~nibble_masks[ addr - 0x138 ];
             saturn.timer2 |= val << ( ( addr - 0x138 ) * 4 );
+            /* TIMER2 is a 32-bit register: wrap it even where word_32 (long) is 64 bits wide, or a write over a negative
+               value keeps its upper bits set and the time adjustment in get_t1_t2() sees a 2^32 ticks jump */
+            saturn.timer2 = ( int32_t )saturn.timer2;
             device.t2_touched = true;
             return;
         default:

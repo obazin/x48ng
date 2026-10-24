@@ -264,7 +264,9 @@ word_64 get_timer( int timer )
             stop <<= 13;
             stop += ( tv.tv_usec << 7 ) / USEC_PER_FRAME;
         }
-        timers[ timer ].value += stop - timers[ timer ].start;
+
+        /* read only: accumulating here would count the same interval again on every call */
+        return timers[ timer ].value + stop - timers[ timer ].start;
     }
 
     return timers[ timer ].value;

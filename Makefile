@@ -154,9 +154,10 @@ endif
 
 # src/ui4x/libui4x ############################
 UI4X_DIR = src/ui4x
+DATADIR_STAMP = .datadir
 UI4X_LDLIBS = -L$(UI4X_DIR) -lui4x
 
-libui4x:
+libui4x: $(DATADIR_STAMP)
 	$(MAKE) -C $(UI4X_DIR) libui4x.a \
 		WITH_SDL=$(WITH_SDL) \
 		WITH_SDL2=$(WITH_SDL2) \
@@ -210,6 +211,17 @@ pretty-code:
 ###############
 # Compilation #
 ###############
+# DATADIR is compiled in, so record it and rebuild everything when it changes (e.g. a new PREFIX)
+$(DATADIR_STAMP): FORCE
+	@if [ "$$(cat $@ 2> /dev/null)" != "$(DATADIR)" ]; then \
+		echo "$(DATADIR)" > $@; \
+		$(MAKE) -C $(UI4X_DIR) clean; \
+	fi
+
+FORCE:
+
+$(OBJS): $(DATADIR_STAMP)
+
 %.o: %.c
 	$(CC) $(CFLAGS) -o $@ -c $<
 
@@ -245,7 +257,7 @@ distclean-firmware:
 # Cleaning #
 ############
 clean: clean-libui4x
-	rm -f core *~ .depend
+	rm -f core *~ .depend $(DATADIR_STAMP)
 	rm -f $(OBJS)
 
 mrproper: clean distclean-libui4x

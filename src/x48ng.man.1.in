@@ -89,7 +89,7 @@ where options include (depending on compiled front-ends):
 .br
         \-t \-\-terminal            activate pseudo terminal interface (default: false)
 .br
-        \-s \-\-serial              activate serial interface (default: false)
+        \-\-serial                 activate serial interface (default: false)
 .br
            \-\-debug                enable the debugger
 .br

@@ -19,30 +19,30 @@ static config_t __config = {
 
     .print_config_and_exit = false,
 
-    .ir_serial_device = NULL,
+    .ir_serial_device = ( char* )"/dev/ttyS0",
 };
 
-static void show_help( void )
+/* runs before ui4x_init(), so ui4x_config.progname isn't set yet */
+static void show_help( const char* progname )
 {
     fprintf( stdout,
              "%s %i.%i.%i\n"
-             "Emulator for HP 49G+ / 50G calculators' hardware\n"
+             "Emulator for HP 48SX / 48GX calculators' hardware\n"
              "Usage: %s [<options>]\n"
              "Valid options:\n"
              "-h --help                    print this message and exit\n"
              "-v --version                 print out version\n"
              "-r --reset                   reboot on startup instead of continuing from the saved state in the state file\n"
-             "     --print-config       print configuration as config file\n"
-             "  -t --terminal           activate pseudo terminal interface (default: "
-             "true)\n"
-             "  -s --serial             activate serial interface (default: false)\n"
-             "     --debug              enable the debugger\n"
-             "  -T --throttle           try to emulate real speed (default: false)\n"
-             "     --inhibit-shutdown   __tentative fix for stuck-on-OFF bug__ (default: "
-             "false)\n"
+             "   --print-config            print configuration as config file\n"
+             "-t --terminal                activate the wire interface on a pseudo terminal (default: false)\n"
+             "   --serial                  activate the IR interface on the serial line (default: false)\n"
+             "   --serial-line=<path>      serial line used by the IR interface (default: %s)\n"
+             "   --debug                   enable the debugger\n"
+             "-T --throttle                try to emulate real speed (default: false)\n"
+             "   --inhibit-shutdown        __tentative fix for stuck-on-OFF bug__ (default: false)\n"
              "\n"
              "%s\n",
-             ui4x_config.progname, VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL, ui4x_config.progname, ui4x_get_help_string() );
+             progname, VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL, progname, __config.ir_serial_device, ui4x_get_help_string() );
 }
 
 char* config_to_string( void )
@@ -50,7 +50,7 @@ char* config_to_string( void )
     char* config;
     if ( -1 == asprintf( &config,
                          "--------------------------------------------------------------------------------\n"
-                         "-- Configuration file for x50ng\n"
+                         "-- Configuration file for x48ng\n"
                          "-- This is a comment\n"
                          "%s\n"
                          "--- End of x48ng configuration -----------------------------------------------\n",
@@ -68,7 +68,8 @@ config_t* config_init( int argc, char* argv[] )
     /* The cli options are temporaly stored in their clopt_* variables */
     int clopt_print_config_and_exit = false;
 
-    const char* optstring = "hvVrtsT";
+    /* no -s: ui4x parses the same command line and uses it for --style */
+    const char* optstring = "hvVrtT";
     struct option long_options[] = {
         {"help",             no_argument,       NULL,                         'h' },
         {"version",          no_argument,       NULL,                         'v' },
@@ -78,8 +79,9 @@ config_t* config_init( int argc, char* argv[] )
 
         {"reset",            no_argument,       NULL,                         'r' },
 
-        {"terminal",         required_argument, NULL,                         't' },
-        {"serial",           required_argument, NULL,                         's' },
+        {"terminal",         no_argument,       NULL,                         't' },
+        {"serial",           no_argument,       NULL,                         12  },
+        {"serial-line",      required_argument, NULL,                         13  },
         {"debug",            no_argument,       NULL,                         11  },
 
         {"throttle",         no_argument,       NULL,                         'T' },
@@ -95,7 +97,7 @@ config_t* config_init( int argc, char* argv[] )
         arg = getopt_long( argc, argv, optstring, long_options, &option_index );
         switch ( arg ) {
             case 'h':
-                show_help();
+                show_help( g_path_get_basename( argv[ 0 ] ) );
                 exit( EXIT_SUCCESS );
                 break;
             case 'v':
@@ -106,11 +108,14 @@ config_t* config_init( int argc, char* argv[] )
             case 'r':
                 __config.reset = true;
                 break;
-            case 's':
+            case 't':
                 __config.enable_wire = true;
                 break;
-            case 't':
+            case 12:
                 __config.enable_ir = true;
+                break;
+            case 13:
+                __config.ir_serial_device = strdup( optarg );
                 break;
             case 'T':
                 __config.throttle = true;

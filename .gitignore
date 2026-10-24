@@ -9,3 +9,4 @@ dist/x48ng-dumprom
 dist/x48ng-mkcard
 /compile_commands.json
 /.depend
+/.direnv/

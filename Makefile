@@ -121,8 +121,12 @@ override CFLAGS := \
 
 override LDFLAGS := \
 	$(LDFLAGS) \
-	$(DEBUG_LDFLAGS) \
-	-Wl,--no-as-needed
+	$(DEBUG_LDFLAGS)
+
+# Apple's linker has no --as-needed behaviour to turn off
+ifneq ($(shell uname -s), Darwin)
+override LDFLAGS += -Wl,--no-as-needed
+endif
 
 SRCS = src/options.c \
 	src/romio.c \
@@ -257,16 +261,16 @@ distclean: mrproper distclean-firmware
 ################
 install: all
 	mkdir -p "$(DESTDIR)$(BINDIR)/"
-	install -D -m 755 dist/$(TARGET) "$(DESTDIR)$(BINDIR)/$(TARGET)"
-	install -D -m 755 dist/$(TARGET)-launcher "$(DESTDIR)$(BINDIR)/$(TARGET)-launcher"
+	install -m 755 dist/$(TARGET) "$(DESTDIR)$(BINDIR)/$(TARGET)"
+	install -m 755 dist/$(TARGET)-launcher "$(DESTDIR)$(BINDIR)/$(TARGET)-launcher"
 	mkdir -p "$(DESTDIR)$(MENUDIR)/"
-	install -D -m 644 dist/$(TARGET).desktop "$(DESTDIR)$(MENUDIR)/$(TARGET).desktop"
+	install -m 644 dist/$(TARGET).desktop "$(DESTDIR)$(MENUDIR)/$(TARGET).desktop"
 	mkdir -p "$(DESTDIR)$(MANDIR)/"
-	install -D -m 644 dist/$(TARGET).man.1 "$(DESTDIR)$(MANDIR)/$(TARGET).1"
+	install -m 644 dist/$(TARGET).man.1 "$(DESTDIR)$(MANDIR)/$(TARGET).1"
 	mkdir -p "$(DESTDIR)$(DATADIR)/"
 	cp -r dist/ROMs/ "$(DESTDIR)$(DATADIR)/ROMs"
 	cp -r dist/hplogo.png "$(DESTDIR)$(DATADIR)/"
-	cp -r src/ui4x/themes/ src/ui4x/*.css "$(DESTDIR)$(DATADIR)/"
+	cp -r src/ui4x/themes src/ui4x/*.css "$(DESTDIR)$(DATADIR)/"
 	mkdir -p "$(DESTDIR)$(DOCDIR)/"
 	cp -r ./doc* ./romdump/ ./README.* ./LICENSE ./AUTHORS ./*.png "$(DESTDIR)$(DOCDIR)/"
 

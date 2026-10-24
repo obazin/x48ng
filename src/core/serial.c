@@ -188,6 +188,31 @@ void serial_baud( int baud )
 #  pragma GCC diagnostic pop // restore previous diag context
 #endif
     baud &= 0x7;
+#if defined( __APPLE__ )
+    /* Darwin keeps the line speed in c_ispeed/c_ospeed rather than in c_cflag bits */
+    speed_t speed;
+    switch ( baud ) {
+        case 0: /* 1200 */
+            speed = B1200;
+            break;
+        case 2: /* 2400 */
+            speed = B2400;
+            break;
+        case 4: /* 4800 */
+            speed = B4800;
+            break;
+        case 6: /* 9600 */
+            speed = B9600;
+            break;
+        default: /* 1920, 3840, 7680, 15360 have no Darwin equivalent */
+            if ( ir_fd >= 0 && ui4x_config.verbose )
+                fprintf( stderr, "can\'t set baud rate, using 9600\n" );
+
+            speed = B9600;
+            break;
+    }
+    cfsetspeed( &ttybuf, speed );
+#else
     switch ( baud ) {
         case 0: /* 1200 */
             ttybuf.c_cflag |= B1200;
@@ -233,6 +258,7 @@ void serial_baud( int baud )
 
         ttybuf.c_cflag |= B9600;
     }
+#endif
 
     if ( ir_fd >= 0 ) {
 #if defined( TCSANOW )

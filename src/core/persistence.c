@@ -303,7 +303,7 @@ static int read_mem_file( char* name, Nibble* mem, int size )
 
         if ( st.st_size != size / 2 ) {
             if ( ui4x_config.verbose )
-                fprintf( stderr, "strange size %s, expected %d, found %ld\n", name, size / 2, st.st_size );
+                fprintf( stderr, "strange size %s, expected %d, found %lld\n", name, size / 2, ( long long )st.st_size );
             fclose( fp );
             return 0;
         }

@@ -173,7 +173,7 @@ extern button_t buttons_49g[ NB_HP4950_KEYS ];
 extern button_t buttons_40g[ NB_HP4950_KEYS ];
 extern button_t buttons_50g[ NB_HP4950_KEYS ];
 
-extern char* ui_annunciators[ NB_ANNUNCIATORS ];
+extern const char* ui_annunciators[ NB_ANNUNCIATORS ];
 
 /********************************************/
 /* API for UI to interact with the emulator */

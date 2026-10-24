@@ -113,7 +113,7 @@ static ui4x_temp_config_t __file_config = {
     .sd_dir = NULL,
 };
 
-char* ui_annunciators[ NB_ANNUNCIATORS ] = { "↰", "↱", "α", "🪫", "⌛", "⇄" };
+const char* ui_annunciators[ NB_ANNUNCIATORS ] = { "↰", "↱", "α", "🪫", "⌛", "⇄" };
 
 ui4x_emulator_api_t ui4x_emulator_api;
 
@@ -507,16 +507,16 @@ static ui4x_temp_config_t* ui_config_read_file( char* filename )
     return &__file_config;
 }
 
-static char* bool_to_string( bool val ) { return val ? "true" : "false"; }
+static const char* bool_to_string( bool val ) { return val ? "true" : "false"; }
 
-static char* frontend_to_string( ui4x_frontend_t f )
+static const char* frontend_to_string( ui4x_frontend_t f )
 {
     return f == FRONTEND_GTK
                ? "gtk"
                : ( f == FRONTEND_SDL ? "sdl" : ( ui4x_config.tiny ? "tui-tiny" : ( ui4x_config.small ? "tui-small" : "tui" ) ) );
 }
 
-static char* model_to_string( ui4x_model_t m )
+static const char* model_to_string( ui4x_model_t m )
 {
     switch ( m ) {
         case MODEL_48GX:
@@ -589,10 +589,10 @@ lua_State* ui4x_load_lua_file( const char* filename )
     return lua_values;
 }
 
-char* ui4x_get_help_string( void )
+const char* ui4x_get_help_string( void )
 {
     return "-V --verbose                 print out more information\n"
-           "-d --datadir[=absolute path] alternate datadir (default: $XDG_CONFIG_HOME/%s/)\n"
+           "-d --datadir[=absolute path] alternate datadir (default: $XDG_CONFIG_HOME/<program name>/)\n"
            "   --sd-dir[=absolute path]  directory to mount as SD card (default: none)\n"
            "\n"
            "-n --name[=text]             customize the title of the window\n"

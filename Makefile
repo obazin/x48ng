@@ -34,29 +34,33 @@ OPTIM ?= 2
 
 MAKEFLAGS +=-j$(NUM_CORES) -l$(NUM_CORES)
 
-cc-option = $(shell if $(CC) $(1) -c -x c /dev/null -o /dev/null > /dev/null 2>&1; \
+# pkg-config --cflags, with -I turned into -isystem so our warnings don't apply to third-party headers
+pkg-cflags = $(patsubst -I%,-isystem %,$(shell "$(PKG_CONFIG)" --cflags $(1)))
+
+# -Werror: clang merely warns about unknown options, which would make every probe succeed
+cc-option = $(shell if $(CC) -Werror $(1) -c -x c /dev/null -o /dev/null > /dev/null 2>&1; \
 		  then echo $(1); fi)
 
-GLIB2_CFLAGS = $(shell "$(PKG_CONFIG)" --cflags glib-2.0)
+GLIB2_CFLAGS = $(call pkg-cflags,glib-2.0)
 GLIB2_LDLIBS = $(shell "$(PKG_CONFIG)" --libs glib-2.0)
 
-GTK_CFLAGS = $(shell "$(PKG_CONFIG)" --cflags gtk4) -DHAS_GTK=1
+GTK_CFLAGS = $(call pkg-cflags,gtk4) -DHAS_GTK=1
 GTK_LDLIBS = $(shell "$(PKG_CONFIG)" --libs gtk4)
 
-LUA_CFLAGS = $(shell "$(PKG_CONFIG)" --cflags $(LUA_VERSION))
+LUA_CFLAGS = $(call pkg-cflags,$(LUA_VERSION))
 LUA_LDLIBS = $(shell "$(PKG_CONFIG)" --libs $(LUA_VERSION))
 
-NCURSES_CFLAGS = $(shell "$(PKG_CONFIG)" --cflags ncursesw readline tinfo) -DNCURSES_WIDECHAR=1 -DHAS_NCURSES=1
+NCURSES_CFLAGS = $(call pkg-cflags,ncursesw readline tinfo) -DNCURSES_WIDECHAR=1 -DHAS_NCURSES=1
 NCURSES_LDLIBS = $(shell "$(PKG_CONFIG)" --libs ncursesw readline tinfo)
 
 ### SDL UI
 ifeq ($(WITH_SDL), yes)
-	SDL_CFLAGS = $(shell "$(PKG_CONFIG)" --cflags sdl3) -DHAS_SDL=1
+	SDL_CFLAGS = $(call pkg-cflags,sdl3) -DHAS_SDL=1
 	SDL_LDLIBS = $(shell "$(PKG_CONFIG)" --libs sdl3)
 endif
 
 ifeq ($(WITH_SDL2), yes)
-	SDL_CFLAGS = $(shell "$(PKG_CONFIG)" --cflags sdl2) -DHAS_SDL=1 -DHAS_SDL2=1
+	SDL_CFLAGS = $(call pkg-cflags,sdl2) -DHAS_SDL=1 -DHAS_SDL2=1
 	SDL_LDLIBS = $(shell "$(PKG_CONFIG)" --libs sdl2)
 endif
 

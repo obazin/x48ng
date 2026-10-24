@@ -205,7 +205,7 @@ typedef struct ui4x_emulator_api_t {
 extern ui4x_config_t ui4x_config;
 
 extern lua_State* ui4x_load_lua_file( const char* filename );
-extern char* ui4x_get_help_string( void );
+extern const char* ui4x_get_help_string( void );
 extern char* ui4x_get_config_as_string( void );
 
 extern char* ui4x_make_filename_absolute_for_loading( char* filename );

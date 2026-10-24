@@ -92,7 +92,7 @@ int main( int argc, char** argv )
         ui4x_config.name = strdup( progname );
 
     if ( ui4x_config.style_filename == NULL )
-        ui4x_config.style_filename = opt_gx ? "themes/48gx/style.css" : "themes/48sx/style.css";
+        ui4x_config.style_filename = opt_gx ? ( char* )"themes/48gx/style.css" : ( char* )"themes/48sx/style.css";
 
     if ( x48ng_config.print_config_and_exit || ui4x_config.verbose )
         fprintf( stdout, "%s", config_to_string() );

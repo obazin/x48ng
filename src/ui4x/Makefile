@@ -17,11 +17,15 @@ PKG_CONFIG ?= pkg-config
 
 MAKEFLAGS += -j$(NUM_CORES) -l$(NUM_CORES)
 
-cc-option = $(shell if $(CC) $(1) -c -x c /dev/null -o /dev/null > /dev/null 2>&1; \
+# pkg-config --cflags, with -I turned into -isystem so our warnings don't apply to third-party headers
+pkg-cflags = $(patsubst -I%,-isystem %,$(shell "$(PKG_CONFIG)" --cflags $(1)))
+
+# -Werror: clang merely warns about unknown options, which would make every probe succeed
+cc-option = $(shell if $(CC) -Werror $(1) -c -x c /dev/null -o /dev/null > /dev/null 2>&1; \
 		  then echo $(1); fi)
 
 ### lua
-LUA_CFLAGS = $(shell "$(PKG_CONFIG)" --cflags $(LUA_VERSION))
+LUA_CFLAGS = $(call pkg-cflags,$(LUA_VERSION))
 LUA_LDLIBS = $(shell "$(PKG_CONFIG)" --libs $(LUA_VERSION))
 
 ifeq ($(FULL_WARNINGS), no)
@@ -41,13 +45,13 @@ EXTRA_WARNING_FLAGS := -Wunused-function \
 endif
 
 ### Text UI
-NCURSES_CFLAGS = $(shell "$(PKG_CONFIG)" --cflags ncursesw) -DNCURSES_WIDECHAR=1 -DHAS_NCURSES=1
+NCURSES_CFLAGS = $(call pkg-cflags,ncursesw) -DNCURSES_WIDECHAR=1 -DHAS_NCURSES=1
 NCURSES_LDLIBS = $(shell "$(PKG_CONFIG)" --libs ncursesw)
 NCURSES_SRC = src/ncurses.c
 
 ### SDL UI
 ifeq ($(WITH_SDL), yes)
-	SDL_CFLAGS = $(shell "$(PKG_CONFIG)" --cflags sdl3) -DHAS_SDL=1
+	SDL_CFLAGS = $(call pkg-cflags,sdl3) -DHAS_SDL=1
 	SDL_LDLIBS = $(shell "$(PKG_CONFIG)" --libs sdl3)
 	SDL_SRC = src/sdl.c \
 		src/sdl_bitmaps.c \
@@ -55,13 +59,13 @@ ifeq ($(WITH_SDL), yes)
 endif
 
 ifeq ($(WITH_SDL2), yes)
-	SDL_CFLAGS = $(shell "$(PKG_CONFIG)" --cflags sdl2) -DHAS_SDL=1 -DHAS_SDL2=1
+	SDL_CFLAGS = $(call pkg-cflags,sdl2) -DHAS_SDL=1 -DHAS_SDL2=1
 	SDL_LDLIBS = $(shell "$(PKG_CONFIG)" --libs sdl2)
 	SDL_SRC = src/sdl.c
 endif
 
 ifeq ($(WITH_GTK), yes)
-	GTK_CFLAGS = $(shell "$(PKG_CONFIG)" --cflags gtk4) -DHAS_GTK=1
+	GTK_CFLAGS = $(call pkg-cflags,gtk4) -DHAS_GTK=1
 	GTK_LDLIBS = $(shell "$(PKG_CONFIG)" --libs gtk4)
 	GTK_SRC = src/gtk.c
 endif

@@ -49,7 +49,6 @@ bool read_rom_file( const char* name, unsigned char** mem, unsigned int* size )
         fprintf( stderr, "%s is an HP49 ROM\n", name );
         *size = 2 * st.st_size;
     } else if ( four[ 0 ] ) {
-        printf( "%ld\n", st.st_size );
         *size = st.st_size;
     } else {
         fprintf( stderr, "%s is not a HP48 ROM\n", name );
@@ -84,7 +83,7 @@ bool read_rom_file( const char* name, unsigned char** mem, unsigned int* size )
          */
 
         if ( st.st_size != *size / 2 ) {
-            fprintf( stderr, "strange size %s, expected %d, found %ld\n", name, *size / 2, st.st_size );
+            fprintf( stderr, "strange size %s, expected %d, found %lld\n", name, *size / 2, ( long long )st.st_size );
             free( *mem );
             *mem = NULL;
             *size = 0;

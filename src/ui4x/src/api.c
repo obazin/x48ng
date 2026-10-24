@@ -113,7 +113,7 @@ static ui4x_temp_config_t __file_config = {
     .sd_dir = NULL,
 };
 
-char* ui_annunciators[ NB_ANNUNCIATORS ] = { "⮢", "⮣", "α", "🪫", "⌛", "⇄" };
+char* ui_annunciators[ NB_ANNUNCIATORS ] = { "↰", "↱", "α", "🪫", "⌛", "⇄" };
 
 ui4x_emulator_api_t ui4x_emulator_api;
 

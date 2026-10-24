@@ -978,7 +978,7 @@ button_t buttons_49g[ NB_HP4950_KEYS ] = {
      /*  */
       .css_class = "shift-left",
      .css_id = "SHIFT-LEFT",
-     .label = "⮢",
+     .label = "↰",
      .letter = NULL,
      .left = "",
      .right = NULL,
@@ -1088,7 +1088,7 @@ button_t buttons_49g[ NB_HP4950_KEYS ] = {
      /*  */
       .css_class = "shift-right",
      .css_id = "SHIFT-RIGHT",
-     .label = "⮣",
+     .label = "↱",
      .letter = NULL,
      .left = "",
      .right = NULL,

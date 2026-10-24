@@ -139,6 +139,7 @@ extern bool device_check;
 
 extern saturn_t saturn;
 extern bool sigalarm_triggered;
+extern bool in_shutdown; /* asleep in the SHUTDN instruction, waiting for a key or a timer */
 extern long sched_timer1;
 extern long sched_timer2;
 extern unsigned long t1_i_per_tick;

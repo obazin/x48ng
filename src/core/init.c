@@ -118,6 +118,17 @@ void start_emulator( void )
 
 void stop_emulator( void )
 {
-    if ( save_before_exit )
-        write_files();
+    if ( !save_before_exit )
+        return;
+
+    /* Quitting while asleep in SHUTDN (e.g. while the calculator is off): save the PC on the SHUTDN instruction itself,
+       so that on restart the CPU goes back to sleep where it was. Resuming after it instead makes the ROM believe it
+       woke up without the ON key held, and it ends up running with the display off, deaf to ON. */
+    if ( in_shutdown )
+        saturn.pc -= 3;
+
+    write_files();
+
+    if ( in_shutdown )
+        saturn.pc += 3;
 }

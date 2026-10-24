@@ -49,6 +49,7 @@ bool device_check = false;
 
 saturn_t saturn;
 bool sigalarm_triggered = false;
+bool in_shutdown = false;
 long sched_timer1 = SCHED_TIMER1;
 long sched_timer2 = SCHED_TIMER2;
 unsigned long t1_i_per_tick;
@@ -1236,6 +1237,7 @@ static bool step_instruction_080( void )
                 bool wake = in_debugger;
                 t1_t2_ticks ticks;
 
+                in_shutdown = true;
                 do {
                     pause();
 
@@ -1290,6 +1292,7 @@ static bool step_instruction_080( void )
                     if ( enter_debugger )
                         wake = true;
                 } while ( !wake );
+                in_shutdown = false;
 
                 stop_timer( IDLE_TIMER );
                 start_timer( RUN_TIMER );

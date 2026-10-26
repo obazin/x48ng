@@ -73,4 +73,5 @@ if [ ! -e "$CONFIGDIR"/config.lua ]; then
     "$BINNAME" --print-config > "$CONFIGDIR"/config.lua
 fi
 
-"$BINNAME" $RESET "$@"
+# exec: replace the shell, so the calculator keeps its process (and its place in the Dock when started from x48ng.app)
+exec "$BINNAME" $RESET "$@"

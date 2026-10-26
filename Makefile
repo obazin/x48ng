@@ -18,6 +18,7 @@ DATADIR ?= $(PREFIX)/share/$(TARGET)
 DOCDIR ?= $(PREFIX)/share/doc/$(TARGET)
 MENUDIR ?= $(PREFIX)/share/applications
 MANDIR ?= $(PREFIX)/share/man/man1
+APPDIR ?= $(HOME)/Applications
 
 PKG_CONFIG ?= pkg-config
 
@@ -246,6 +247,51 @@ manfile: src/$(TARGET).man.1.in
 	cp $< dist/$(TARGET).man.1
 
 
+#####################
+# macOS app bundle  #
+#####################
+# Self-contained: the binary, the libraries it links to (copied out of e.g. the Nix store), the themes and the ROMs (downloaded once).
+# The launcher script runs from Contents/MacOS, where links make it and x48ng find ROMs/ and themes/.
+# Everything gets an ad-hoc signature because macOS refuses to launch unsigned code.
+APP = dist/$(TARGET).app
+APP_MINIMUM_SYSTEM_VERSION = 13.0
+APP_ICONSET = dist/$(TARGET).iconset
+
+app: all pull-firmware
+ifneq ($(shell uname -s), Darwin)
+	@echo "make app builds a macOS application bundle and only works on macOS" >&2; exit 1
+endif
+	rm -rf $(APP) $(APP_ICONSET)
+	mkdir -p $(APP)/Contents/MacOS $(APP)/Contents/Resources $(APP_ICONSET)
+	sed -e 's|@VERSION@|$(VERSION_MAJOR).$(VERSION_MINOR).$(PATCHLEVEL)|g' \
+		-e 's|@MINIMUM_SYSTEM_VERSION@|$(APP_MINIMUM_SYSTEM_VERSION)|g' \
+		src/macos/Info.plist.in > $(APP)/Contents/Info.plist
+	$(CC) -O2 -mmacosx-version-min=$(APP_MINIMUM_SYSTEM_VERSION) -o $(APP)/Contents/MacOS/$(TARGET)-app src/macos/launcher.c
+	cp dist/$(TARGET) dist/$(TARGET)-launcher $(APP)/Contents/MacOS/
+	sh src/macos/bundle-libraries.sh $(APP) $(APP)/Contents/MacOS/$(TARGET)
+	cp -R dist/ROMs src/ui4x/themes src/ui4x/*.css $(APP)/Contents/Resources/
+	ln -s ../Resources/ROMs $(APP)/Contents/MacOS/ROMs
+	ln -s ../Resources/themes $(APP)/Contents/MacOS/themes
+	for size in 16 32 128 256 512; do \
+		sips -s format png -z $$size $$size dist/hplogo.png --out $(APP_ICONSET)/icon_$${size}x$${size}.png > /dev/null; \
+		sips -s format png -z $$((size * 2)) $$((size * 2)) dist/hplogo.png --out $(APP_ICONSET)/icon_$${size}x$${size}@2x.png > /dev/null; \
+	done
+	iconutil -c icns $(APP_ICONSET) -o $(APP)/Contents/Resources/$(TARGET).icns
+	rm -rf $(APP_ICONSET)
+	codesign --force -s - $(APP)/Contents/MacOS/$(TARGET)-launcher
+	codesign --force -s - $(APP)
+
+install-app: app
+	mkdir -p "$(DESTDIR)$(APPDIR)/"
+	rm -rf "$(DESTDIR)$(APPDIR)/$(TARGET).app"
+	cp -R $(APP) "$(DESTDIR)$(APPDIR)/"
+
+uninstall-app:
+	rm -rf "$(DESTDIR)$(APPDIR)/$(TARGET).app"
+
+.PHONY: app install-app uninstall-app
+
+
 ###########################################
 # Populate dist/firmware/ from hpcalc.org #
 ###########################################
@@ -267,6 +313,7 @@ clean: clean-libui4x
 mrproper: clean distclean-libui4x
 	rm -f compile_commands.json
 	rm -f dist/$(TARGET) dist/$(TARGET).desktop dist/$(TARGET).man.1
+	rm -rf dist/$(TARGET).app dist/$(TARGET).iconset
 	find . -name \*.o -exec  rm {} \;
 
 distclean: mrproper distclean-firmware

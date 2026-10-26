@@ -11,6 +11,8 @@ This is my fork of x48-0.6.4 where I deviate from the original code and do my ow
 
 [ The reference public source repository is https://codeberg.org/gwh/x48ng ]
 
+> **This repository is a modified fork of [x48ng](https://codeberg.org/gwh/x48ng)** that adds macOS support (native build, SDL rendering fixes, a self-contained `x48ng.app`) and various fixes; see the git history for the changes. Like the original, it is distributed under the GNU General Public License version 2 (`LICENSE`), and the vendored `src/ui4x` under the GNU General Public License version 3 (`src/ui4x/LICENSE`).
+
 ## Usage
 
 `x48ng-launcher --help`
@@ -114,6 +116,7 @@ The provided `shell.nix` brings every dependency, and `.envrc` loads it automati
 
 - Build with `nix-shell --run make`, or just `make` once direnv is set up.
 - `/usr` is read-only on macOS, so install somewhere else, for example `make install PREFIX=$HOME/.local` (with `~/.local/bin` in your `PATH`).
+- `make install-app` puts an `x48ng.app` in `~/Applications` (override with `APPDIR`), to start the calculator from Spotlight, the Dock or Finder without a terminal. The app is self-contained: it carries the binary, every library it links to (copied out of the Nix store and re-signed), the themes and the ROMs (downloaded from hpcalc.org on the first build, like `make get-roms`), so it keeps working after the Nix store is garbage-collected and doesn't need `make install`. It shares `~/.config/x48ng` with the command-line version, and sets it up on first launch. `make app` only builds the bundle in `dist/`, and `make uninstall-app` removes it.
 - The SDL front-end (`x48ng-launcher --sdl`, or `frontend = "sdl"` in `~/.config/x48ng/config.lua`) renders with Metal. It stays responsive while its window is hidden and handles resizing.
 
 ## Development
